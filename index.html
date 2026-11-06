@@ -1,0 +1,2667 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>피타고라스 정리 탐구 연구소 - 2022 개정 중2 수학 (브루너 EIS 모델)</title>
+  <style>
+    :root {
+      --primary: #4361ee;
+      --primary-light: #eef2ff;
+      --primary-dark: #2a3eb1;
+      --secondary: #3f37c9;
+      --accent: #f72585;
+      --aqua: #4cc9f0;
+      --orange: #f8961e;
+      --green: #2ec4b6;
+      --success: #10b981;
+      --bg-dark: #0f172a;
+      --bg-panel: #ffffff;
+      --bg-canvas: #f8fafc;
+      --border: #e2e8f0;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.05);
+      --font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Pretendard", "Segoe UI", Roboto, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background-color: #f1f5f9;
+      color: var(--text-main);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* 상단 네비게이션 헤더 */
+    header {
+      background: #ffffff;
+      height: 56px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      flex-shrink: 0;
+      box-shadow: var(--shadow-sm);
+      z-index: 20;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .app-logo {
+      font-size: 22px;
+      line-height: 1;
+    }
+
+    .app-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--primary-dark);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .badge-curriculum {
+      font-size: 11px;
+      font-weight: 600;
+      background: #e0e7ff;
+      color: #3730a3;
+      padding: 2px 8px;
+      border-radius: 12px;
+    }
+
+    .eis-stepper {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #f8fafc;
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+    }
+
+    .eis-step {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 6px;
+      border-radius: 10px;
+      transition: all 0.2s;
+    }
+
+    .eis-step.active {
+      background: var(--primary);
+      color: #ffffff;
+    }
+
+    .eis-arrow {
+      color: #cbd5e1;
+      font-size: 10px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-icon {
+      background: #f1f5f9;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.15s;
+    }
+
+    .btn-icon:hover {
+      background: #e2e8f0;
+    }
+
+    /* 메인 3단 레이아웃 (태블릿 가로 30% : 50% : 20%) */
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 320px 1fr 280px;
+      height: calc(100vh - 56px);
+      overflow: hidden;
+      background: #f1f5f9;
+    }
+
+    @media (max-width: 1100px) {
+      main {
+        grid-template-columns: 290px 1fr 260px;
+      }
+    }
+
+    /* ========================================================
+       좌측 패널: 조작 & 튜터 (Enactive)
+       ======================================================== */
+    .panel-left {
+      background: var(--bg-panel);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      padding: 14px;
+      gap: 14px;
+    }
+
+    /* 모드 탭 버튼 */
+    .mode-tab-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      background: #f8fafc;
+      padding: 6px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    .mode-tab-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding-left: 4px;
+    }
+
+    .mode-tabs {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 4px;
+    }
+
+    .tab-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-main);
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s;
+    }
+
+    .tab-btn .badge-req {
+      font-size: 10px;
+      background: #fee2e2;
+      color: #ef4444;
+      padding: 1px 5px;
+      border-radius: 6px;
+      margin-left: auto;
+    }
+
+    .tab-btn.active {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+      box-shadow: 0 2px 4px rgba(67, 97, 238, 0.3);
+    }
+
+    .tab-btn.active .badge-req {
+      background: rgba(255, 255, 255, 0.3);
+      color: #ffffff;
+    }
+
+    /* 슬라이더 컨트롤 카드 */
+    .control-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .control-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .control-card-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .snap-toggle {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #4338ca;
+      cursor: pointer;
+      background: #eef2ff;
+      padding: 3px 8px;
+      border-radius: 12px;
+    }
+
+    .slider-row {
+      margin-bottom: 12px;
+    }
+
+    .slider-row:last-child {
+      margin-bottom: 4px;
+    }
+
+    .slider-label-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .slider-label-row .color-indicator {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+      margin-right: 5px;
+    }
+
+    .slider-val-box {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--primary-dark);
+      background: #f1f5f9;
+      padding: 1px 6px;
+      border-radius: 6px;
+    }
+
+    .custom-range {
+      width: 100%;
+      height: 8px;
+      border-radius: 4px;
+      background: #e2e8f0;
+      outline: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+
+    .custom-range::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--primary);
+      border: 3px solid #ffffff;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+
+    .custom-range::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+
+    /* 피타고라스 삼쌍 퀵 버튼 */
+    .triplet-quick-btns {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+      margin-top: 8px;
+    }
+
+    .triplet-btn {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-main);
+      padding: 5px 0;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .triplet-btn:hover {
+      background: #eef2ff;
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .triplet-btn.active {
+      background: #4361ee;
+      color: #fff;
+      border-color: #4361ee;
+    }
+
+    /* AI 튜터 캐릭터 & 대화창 */
+    .tutor-card {
+      background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%);
+      border: 1px solid #bae6fd;
+      border-radius: 12px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      position: relative;
+    }
+
+    .tutor-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tutor-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #38bdf8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      flex-shrink: 0;
+      animation: floatAvatar 3s ease-in-out infinite;
+    }
+
+    @keyframes floatAvatar {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-3px); }
+    }
+
+    .tutor-name-role {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .tutor-name {
+      font-size: 12px;
+      font-weight: 800;
+      color: #0369a1;
+    }
+
+    .tutor-role {
+      font-size: 10px;
+      color: #0284c7;
+    }
+
+    .tutor-speech-bubble {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 9px 11px;
+      font-size: 12px;
+      line-height: 1.45;
+      color: #0f172a;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      position: relative;
+      border: 1px solid #e0f2fe;
+      min-height: 48px;
+    }
+
+    .tutor-speech-bubble::before {
+      content: '';
+      position: absolute;
+      top: -6px;
+      left: 18px;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-bottom: 6px solid #ffffff;
+    }
+
+    /* 미니 미션 카드 */
+    .mission-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 12px;
+    }
+
+    .mission-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .mission-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 8px;
+      border-radius: 8px;
+      background: #f8fafc;
+      margin-bottom: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .mission-item.completed {
+      background: #ecfdf5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+    }
+
+    .mission-badge {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #cbd5e1;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .mission-item.completed .mission-badge {
+      background: #10b981;
+    }
+
+    /* ========================================================
+       중앙 영역: 기하학 시각화 캔버스 (Iconic)
+       ======================================================== */
+    .panel-center {
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      background: var(--bg-canvas);
+      overflow: hidden;
+    }
+
+    /* 캔버스 상단 조작 툴바 */
+    .canvas-toolbar {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      right: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .canvas-toolbar > * {
+      pointer-events: auto;
+    }
+
+    .toolbar-left, .toolbar-right {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .btn-action {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 7px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      box-shadow: var(--shadow-md);
+      transition: all 0.2s;
+    }
+
+    .btn-action:hover {
+      background: #f8fafc;
+      transform: translateY(-1px);
+    }
+
+    .btn-action.primary {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+    }
+
+    .btn-action.primary:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-action.accent {
+      background: #10b981;
+      color: #ffffff;
+      border-color: #10b981;
+    }
+
+    .btn-action.accent:hover {
+      background: #059669;
+    }
+
+    #euclidTools {
+      gap: 4px;
+    }
+
+    #euclidTools .btn-action {
+      padding: 6px 9px;
+      white-space: nowrap;
+    }
+
+    #euclidTools [aria-pressed="true"] {
+      background: #7c3aed;
+      color: #fff;
+    }
+
+    .euclid-banner {
+      position: absolute;
+      top: 58px;
+      left: 12px;
+      right: 12px;
+      flex-direction: column;
+      gap: 6px;
+      background: #fff;
+      border: 1px solid #a855f7;
+      border-radius: 12px;
+      padding: 8px 12px;
+      z-index: 15;
+      font-size: 13px;
+    }
+
+    .proof-blank {
+      display: inline-block;
+      min-width: 3em;
+      padding: 1px 5px;
+      border: 1px dashed #7c3aed;
+      border-radius: 4px;
+      text-align: center;
+      color: #5b21b6;
+    }
+
+    #euclidFeedback {
+      color: #5b21b6;
+      min-height: 1.3em;
+    }
+
+    /* 오답 안내 박스 */
+    .formula-error-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: #fee2e2;
+      border: 2px solid #ef4444;
+      border-radius: 10px;
+      padding: 12px 6px;
+      color: #b91c1c;
+      font-size: 15px;
+      font-weight: 800;
+      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .btn-verify-formula.retry-mode {
+      background: #ef4444;
+    }
+
+    .btn-verify-formula.retry-mode:hover {
+      background: #dc2626;
+    }
+
+    /* 메인 캔버스 */
+    #geometryCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: crosshair;
+      touch-action: none;
+    }
+
+    /* 캔버스 하단 상태 힌트 */
+    .canvas-footer-hint {
+      position: absolute;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: max-content;
+      max-width: calc(100% - 24px);
+      text-align: center;
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(6px);
+      color: #ffffff;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      pointer-events: none;
+      z-index: 10;
+      transition: opacity 0.3s;
+    }
+
+    /* ========================================================
+       우측 패널: 데이터 & 수식 도출 (Symbolic)
+       ======================================================== */
+    .panel-right {
+      background: var(--bg-panel);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      padding: 14px;
+      gap: 14px;
+    }
+
+    .section-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .btn-subtle {
+      font-size: 11px;
+      color: var(--text-muted);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .btn-subtle:hover {
+      background: #e2e8f0;
+      color: var(--text-main);
+    }
+
+    /* 탐구 데이터 표 */
+    .table-container {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow-x: auto;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .data-table {
+      width: 100%;
+      min-width: 560px;
+      border-collapse: collapse;
+      font-size: 11px;
+      text-align: center;
+    }
+
+    .data-table th {
+      background: #f8fafc;
+      color: var(--text-muted);
+      font-weight: 700;
+      padding: 7px 4px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .data-table td {
+      padding: 6px 4px;
+      border-bottom: 1px solid #f1f5f9;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .data-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .data-table tr.highlight-row {
+      background: #f0fdf4;
+      animation: highlightFade 1.5s ease-out;
+    }
+
+    .data-table .val-sum {
+      color: #2563eb;
+      font-weight: 800;
+    }
+
+    .data-table .val-c2 {
+      color: #7c3aed;
+      font-weight: 800;
+    }
+
+    .data-table .val-match {
+      background: #dcfce7;
+      color: #15803d;
+      border-radius: 4px;
+      padding: 1px 3px;
+    }
+
+    @keyframes highlightFade {
+      0% { background: #bbf7d0; }
+      100% { background: #f0fdf4; }
+    }
+
+    .record-count-badge {
+      font-size: 11px;
+      font-weight: 600;
+      color: #4338ca;
+      background: #e0e7ff;
+      padding: 2px 7px;
+      border-radius: 10px;
+    }
+
+    /* 수식 도출 & 빈칸 채우기 카드 */
+    .formula-builder-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .builder-question {
+      font-size: 12px;
+      font-weight: 700;
+      color: #1e293b;
+      line-height: 1.4;
+    }
+
+    .formula-equation-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: #f8fafc;
+      padding: 12px 6px;
+      border-radius: 10px;
+      border: 2px dashed #cbd5e1;
+    }
+
+    .formula-slot {
+      width: 44px;
+      height: 40px;
+      background: #ffffff;
+      border: 2px solid var(--primary);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--primary-dark);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .formula-slot.empty {
+      border: 2px dashed #94a3b8;
+      background: #f8fafc;
+      color: #94a3b8;
+    }
+
+    .operator-symbol {
+      font-size: 16px;
+      font-weight: 800;
+      color: #475569;
+    }
+
+    /* 선택 칩 */
+    .symbol-chip-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
+    }
+
+    .symbol-chip {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .symbol-chip:hover {
+      background: #e2e8f0;
+      border-color: #94a3b8;
+      transform: translateY(-1px);
+    }
+
+    .btn-verify-formula {
+      width: 100%;
+      background: var(--primary);
+      color: #ffffff;
+      border: none;
+      padding: 9px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-verify-formula:hover {
+      background: var(--primary-dark);
+    }
+
+    /* 성공 성취 알림 카드 */
+    .achievement-card {
+      display: none;
+      background: linear-gradient(135deg, #fef3c7 0%, #dbeafe 100%);
+      border: 2px solid #f59e0b;
+      border-radius: 12px;
+      padding: 12px;
+      text-align: center;
+      animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.85); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .achievement-icon {
+      font-size: 32px;
+      margin-bottom: 4px;
+    }
+
+    .achievement-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: #b45309;
+      margin-bottom: 4px;
+    }
+
+    .achievement-desc {
+      font-size: 11px;
+      color: #1e3a8a;
+      line-height: 1.4;
+      font-weight: 600;
+    }
+
+    /* 컨페티 캔버스 */
+    #confettiCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 100;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 헤더 -->
+  <header>
+    <div class="header-left">
+      <div class="app-logo">📐</div>
+      <div class="app-title">
+        피타고라스 정리 학습 활동
+        <span class="badge-curriculum">2022 개정 중2 수학</span>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <button class="btn-icon" id="btnSoundToggle" title="소리 켜기/끄기">🔊</button>
+    </div>
+  </header>
+
+  <!-- 3분할 메인 레이아웃 -->
+  <main>
+    <!-- [좌측 패널 30%] 탐구 및 조작 (Enactive) -->
+    <aside class="panel-left">
+      <!-- 미니 미션 (적용 학습) -->
+      <div class="mission-card">
+        <div class="mission-title">
+          <span>🎯 오늘의 탐구 미션</span>
+        </div>
+        <div class="mission-item" id="mission1">
+          <div class="mission-badge" id="mBadge1">1</div>
+          <span>빗변 c = 5 인 직각삼각형 만들기</span>
+        </div>
+        <div class="mission-item" id="mission2">
+          <div class="mission-badge" id="mBadge2">2</div>
+          <span>두 넓이의 합(a²+b²)이 100이 되게 조절하기</span>
+        </div>
+        <div class="mission-item" id="mission3">
+          <div class="mission-badge" id="mBadge3">3</div>
+          <span>데이터 3회 기록 후 관계식 찾기</span>
+        </div>
+      </div>
+
+      <!-- 증명 인터랙티브 모드 탭 -->
+      <div class="mode-tab-group">
+        <div class="mode-tab-title">증명 인터랙티브 모드</div>
+        <div class="mode-tabs">
+          <button class="tab-btn active" data-mode="water" id="tabWater">
+            <span>💧 ① 물 채우기</span>
+            <span class="badge-req">필수</span>
+          </button>
+          <button class="tab-btn" data-mode="puzzle" id="tabPuzzle">
+            <span>🧩 ② 퍼즐맞추기</span>
+          </button>
+          <button class="tab-btn" data-mode="euclid" id="tabEuclid">
+            <span>📐 ③ 증명해보기</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 동적 삼각형 변 조작 카드 -->
+      <div class="control-card">
+        <div class="control-card-header">
+          <div class="control-card-title">
+            <span>📏 직각삼각형 변 조작</span>
+          </div>
+          <div class="snap-toggle" id="btnSnapToggle" title="빗변 c가 자연수가 되도록 자동 스냅합니다">
+            <span id="snapIndicator">🧲 자연수 c ON</span>
+          </div>
+        </div>
+
+        <!-- 밑변 a 조절 -->
+        <div class="slider-row">
+          <div class="slider-label-row">
+            <span><span class="color-indicator" style="background:#0284c7;"></span>밑변 a</span>
+            <span class="slider-val-box" id="valBoxA">a = 3 (a² = 9)</span>
+          </div>
+          <input type="range" min="1" max="15" value="3" step="1" class="custom-range" id="sliderA">
+        </div>
+
+        <!-- 높이 b 조절 -->
+        <div class="slider-row">
+          <div class="slider-label-row">
+            <span><span class="color-indicator" style="background:#ea580c;"></span>높이 b</span>
+            <span class="slider-val-box" id="valBoxB">b = 4 (b² = 16)</span>
+          </div>
+          <input type="range" min="1" max="15" value="4" step="1" class="custom-range" id="sliderB">
+        </div>
+
+        <!-- 빗변 c 안내 -->
+        <div class="slider-label-row" style="margin-top: 6px; padding: 4px 6px; background:#f1f5f9; border-radius:6px;">
+          <span><span class="color-indicator" style="background:#7c3aed;"></span>빗변 c</span>
+          <span style="font-size:12px; font-weight:700; color:#7c3aed;" id="valBoxC">c = 5.0 (c² = 25)</span>
+        </div>
+
+        <!-- 피타고라스 대표 삼쌍 퀵 버튼 -->
+        <div class="triplet-quick-btns">
+          <button class="triplet-btn active" data-a="3" data-b="4">3-4-5</button>
+          <button class="triplet-btn" data-a="6" data-b="8">6-8-10</button>
+          <button class="triplet-btn" data-a="5" data-b="12">5-12-13</button>
+          <button class="triplet-btn" data-a="8" data-b="15">8-15-17</button>
+        </div>
+      </div>
+
+      <!-- AI 튜터 캐릭터 & 발문 대화창 -->
+      <div class="tutor-card">
+        <div class="tutor-header">
+          <div class="tutor-avatar">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <!-- 부엉이 마스코트 SVG -->
+              <circle cx="12" cy="12" r="10" fill="#0284c7" />
+              <circle cx="8" cy="10" r="3" fill="#ffffff" />
+              <circle cx="16" cy="10" r="3" fill="#ffffff" />
+              <circle cx="8" cy="10" r="1.5" fill="#0f172a" />
+              <circle cx="16" cy="10" r="1.5" fill="#0f172a" />
+              <polygon points="12,12 10,15 14,15" fill="#f59e0b" />
+              <path d="M7 6L5 3M17 6L19 3" stroke="#ffffff" stroke-width="2" stroke-linecap="round" />
+            </svg>
+          </div>
+          <div class="tutor-name-role">
+            <div class="tutor-name">AI 피타 쌤</div>
+          </div>
+        </div>
+        <div class="tutor-speech-bubble" id="tutorSpeech">
+          직각삼각형의 변을 조절해보고, 세 정사각형의 넓이에 어떤 비밀이 숨어있는지 탐구해보자!
+        </div>
+        <div class="tutor-speech-bubble" id="puzzleDiscovery" hidden>
+          <p id="puzzleQuestion"></p>
+          <div class="symbol-chip-group" id="puzzleChoices"></div>
+          <p id="puzzleFeedback" role="status"></p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- [중앙 캔버스 50%] 동적 기하학 캔버스 (Iconic) -->
+    <section class="panel-center">
+      <!-- 캔버스 오버레이 툴바 -->
+      <div class="canvas-toolbar">
+        <div class="toolbar-left">
+          <!-- 모드 1: 물 붓기 버튼 -->
+          <button class="btn-action primary" id="btnPourWater">
+            <span id="pourWaterIcon">💧</span> <span id="pourWaterText">물 붓기 시뮬레이션</span>
+          </button>
+
+          <!-- 모드 2: 퍼즐 회전, 힌트 및 리셋 버튼 (모드 2일 때 표시) -->
+          <div id="puzzleTools" style="display:none; gap:6px;">
+            <button class="btn-action" id="btnRotatePiece" title="선택된 조각을 90도 회전합니다">↻ 90° 회전</button>
+            <button class="btn-action" id="btnPuzzleHint">🧩 자동맞춤</button>
+            <button class="btn-action" id="btnPuzzleReset">🔄 조각 원위치</button>
+          </div>
+
+        </div>
+
+        <div class="toolbar-right">
+          <!-- 데이터 표 기록 버튼 -->
+          <button class="btn-action accent" id="btnRecordData">
+            <span>📝 표에 기록하기</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="euclid-banner" id="euclidBanner" style="display:none;">
+        <div id="euclidTools" style="display:flex;" role="group" aria-label="증명 단계">
+          <button class="btn-action" data-proof-step="0" aria-pressed="true">1단계</button>
+          <button class="btn-action" data-proof-step="1" aria-pressed="false">2단계</button>
+          <button class="btn-action" data-proof-step="2" aria-pressed="false">3단계</button>
+        </div>
+        <strong id="euclidStepTitle"></strong>
+        <div id="euclidStepDesc"></div>
+        <div class="symbol-chip-group" id="euclidChoices" role="group" aria-label="빈칸에 넣을 보기"></div>
+        <div id="euclidFeedback" role="status"></div>
+      </div>
+
+      <!-- 메인 캔버스 엘리먼트 -->
+      <canvas id="geometryCanvas"></canvas>
+
+      <!-- 캔버스 하단 조작 가이드 -->
+      <div class="canvas-footer-hint" id="canvasHint">
+        물 붓기를 누르고 두 변 사이의 각에 따라 물이 얼마나 차는지 비교해 보세요.
+      </div>
+    </section>
+
+    <!-- [우측 패널 20%] 데이터 및 상징화 노트 (Symbolic) -->
+    <aside class="panel-right">
+      <!-- 실시간 탐구 데이터 표 -->
+      <div class="section-title">
+        <span>📊 실시간 탐구 데이터 표</span>
+        <span class="record-count-badge" id="recordBadge">기록 0회</span>
+      </div>
+
+      <div class="table-container">
+        <table class="data-table" id="dataTable">
+          <thead>
+            <tr>
+              <th>회차</th>
+              <th>a</th>
+              <th>b</th>
+              <th>c</th>
+              <th>ab</th>
+              <th>bc</th>
+              <th>ca</th>
+              <th>밑변 넓이<br><span style="color:#0284c7; font-weight:800;">(a²)</span></th>
+              <th>높이 넓이<br><span style="color:#ea580c; font-weight:800;">(b²)</span></th>
+              <th>두 넓이의 합<br><span style="color:#2563eb; font-weight:800;">(a²+b²)</span></th>
+              <th>빗변 넓이<br><span style="color:#7c3aed; font-weight:800;">(c²)</span></th>
+            </tr>
+          </thead>
+          <tbody id="dataTableBody">
+            <!-- 행 동적 추가 -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 수식 도출 & 상징화 완성하기 -->
+      <div class="formula-builder-card">
+        <div class="builder-question">
+          ✏️ 데이터 표의 숫자를 보고<br><strong>세 정사각형 넓이의 관계식</strong>을 완성해봐!
+        </div>
+
+        <div class="formula-equation-box" id="formulaEquationBox">
+          <div class="formula-slot empty" id="slot1" data-val="" title="클릭하여 비우기">?</div>
+          <span class="operator-symbol">+</span>
+          <div class="formula-slot empty" id="slot2" data-val="" title="클릭하여 비우기">?</div>
+          <span class="operator-symbol">=</span>
+          <div class="formula-slot empty" id="slot3" data-val="" title="클릭하여 비우기">?</div>
+        </div>
+
+        <!-- 오답 안내 박스 (오답 시 공식 칸을 가리고 표시) -->
+        <div class="formula-error-box" id="formulaErrorBox" style="display:none;">
+          <span style="font-size:18px;">❌</span>
+          <span>오답입니다</span>
+        </div>
+
+        <!-- 칩 선택기 -->
+        <div class="symbol-chip-group" id="symbolChipGroup">
+          <button class="symbol-chip" data-sym="a">a</button>
+          <button class="symbol-chip" data-sym="b">b</button>
+          <button class="symbol-chip" data-sym="c">c</button>
+          <button class="symbol-chip" data-sym="a²">a²</button>
+          <button class="symbol-chip" data-sym="b²">b²</button>
+          <button class="symbol-chip" data-sym="c²">c²</button>
+          <button class="symbol-chip" data-sym="ab">ab</button>
+          <button class="symbol-chip" data-sym="bc">bc</button>
+          <button class="symbol-chip" data-sym="ca">ca</button>
+        </div>
+
+        <button class="btn-verify-formula" id="btnVerifyFormula">정답 확인하기 ✨</button>
+      </div>
+
+      <!-- 성공 및 상징화 성취 알림 -->
+      <div class="achievement-card" id="achievementCard">
+        <div class="achievement-icon">🏆</div>
+        <div class="achievement-title">피타고라스 정리 발견!</div>
+        <div class="achievement-desc">
+          <strong>a² + b² = c²</strong><br>
+          "직각삼각형에서 직각을 낀 두 변의 길이를 각각 한 변으로 하는 정사각형 넓이의 합은 빗변을 한 변으로 하는 정사각형 넓이와 같다."
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- 파티클 효과용 캔버스 -->
+  <canvas id="confettiCanvas"></canvas>
+
+  <script>
+    /* ========================================================
+       1. 전역 상태 및 데이터 구조
+       ======================================================== */
+    const State = {
+      // 삼각형 변
+      a: 3,
+      b: 4,
+      get c() { return Math.hypot(this.a, this.b); },
+      get a2() { return this.a * this.a; },
+      get b2() { return this.b * this.b; },
+      get c2() { return this.a2 + this.b2; },
+
+      // 모드: 'water' | 'puzzle' | 'euclid'
+      mode: 'water',
+      
+      // 스냅 기능 (무리수 방지 피타고라스 삼쌍 우선)
+      snapTriples: true,
+      triplets: [
+        {a: 3, b: 4, c: 5},
+        {a: 4, b: 3, c: 5},
+        {a: 6, b: 8, c: 10},
+        {a: 8, b: 6, c: 10},
+        {a: 5, b: 12, c: 13},
+        {a: 12, b: 5, c: 13},
+        {a: 8, b: 15, c: 17},
+        {a: 15, b: 8, c: 17},
+        {a: 9, b: 12, c: 15},
+        {a: 12, b: 9, c: 15}
+      ],
+
+      // 물 채우기 애니메이션 상태 (0: a,b 채워짐 -> 1: c 채워짐)
+      waterProgress: 0,
+      isPouring: false,
+      waterDirection: 1, // 1: pour into c, -1: return to a,b
+
+      // 퍼즐맞추기 상태
+      puzzlePieces: [],
+      draggedPiece: null,
+      dragOffset: { x: 0, y: 0 },
+      puzzleSolved: false,
+      puzzleDiscovered: false,
+
+      euclidStep: 0,
+      euclidStartedAt: 0,
+
+      // 데이터 표 기록
+      records: [],
+      changeCount: 0,
+
+      // 미션 상태
+      missions: {
+        m1: false, // c = 5
+        m2: false, // a^2 + b^2 = 100
+        m3: false  // 3 records + formula solved
+      },
+
+      // 수식 슬롯
+      slots: ['', '', ''],
+      formulaSolved: false,
+
+      // 사운드 활성화 여부
+      soundEnabled: true
+    };
+
+    /* ========================================================
+       2. Web Audio API 신시사이저 사운드 (오프라인 100%)
+       ======================================================== */
+    let audioCtx = null;
+    function getAudioContext() {
+      if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) {
+          audioCtx = new AudioContextClass();
+        }
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    const Sound = {
+      click() {
+        if (!State.soundEnabled) return;
+        const ctx = getAudioContext();
+        if (!ctx) return;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(600, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + 0.05);
+        gain.gain.setValueAtTime(0.15, ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.01, ctx.currentTime + 0.05);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.05);
+      },
+
+      snap() {
+        if (!State.soundEnabled) return;
+        const ctx = getAudioContext();
+        if (!ctx) return;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(440, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.08);
+        gain.gain.setValueAtTime(0.2, ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.01, ctx.currentTime + 0.08);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.08);
+      },
+
+      splash() {
+        if (!State.soundEnabled) return;
+        const ctx = getAudioContext();
+        if (!ctx) return;
+        // 물방울 퐁당 사운드
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(800, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.12);
+        gain.gain.setValueAtTime(0.25, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.15);
+      },
+
+      fanfare() {
+        if (!State.soundEnabled) return;
+        const ctx = getAudioContext();
+        if (!ctx) return;
+        const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+        notes.forEach((freq, idx) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          const start = ctx.currentTime + idx * 0.12;
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, start);
+          gain.gain.setValueAtTime(0.2, start);
+          gain.gain.exponentialRampToValueAtTime(0.001, start + 0.4);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(start);
+          osc.stop(start + 0.4);
+        });
+      }
+    };
+
+    /* ========================================================
+       3. 캔버스 초기화 & 지오메트리 렌더러
+       ======================================================== */
+    const canvas = document.getElementById('geometryCanvas');
+    const ctx = canvas.getContext('2d');
+    let canvasW = 0;
+    let canvasH = 0;
+    let animFrameId = null;
+
+    function resizeCanvas() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvasW = rect.width;
+      canvasH = rect.height;
+      canvas.width = canvasW * dpr;
+      canvas.height = canvasH * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      initPuzzlePieces();
+    }
+    window.addEventListener('resize', resizeCanvas);
+
+    /* ========================================================
+       4. 기하학 좌표 계산 (Fit-to-Screen)
+       ======================================================== */
+    function computeGeometry() {
+      const a = State.a;
+      const b = State.b;
+      const c = State.c;
+
+      // 직각인 각 C를 원점 (0,0)에 두고, 오른쪽에 오도록 설정:
+      // B = (-a, 0) : 밑변 (C의 왼쪽)
+      // C = (0, 0)  : 직각 꼭짓점 (오른쪽 아래)
+      // A = (0, b)  : 높이 (C의 위쪽)
+      // 사각형 A2 (밑변 a): B(-a, 0) -> C(0, 0) -> (0, -a) -> (-a, -a)
+      // 사각형 B2 (높이 b): C(0, 0) -> (b, 0) -> (b, b) -> A(0, b)
+      // 사각형 C2 (빗변 c): B(-a, 0) -> (-a-b, a) -> (-b, a+b) -> A(0, b)
+
+      const pts = [
+        {x: 0, y: 0},
+        {x: -a, y: 0},
+        {x: 0, y: -a},
+        {x: -a, y: -a},
+        {x: b, y: 0},
+        {x: b, y: b},
+        {x: 0, y: b},
+        {x: -a - b, y: a},
+        {x: -b, y: a + b}
+      ];
+
+      let minX = Infinity, maxX = -Infinity;
+      let minY = Infinity, maxY = -Infinity;
+      pts.forEach(p => {
+        if (p.x < minX) minX = p.x;
+        if (p.x > maxX) maxX = p.x;
+        if (p.y < minY) minY = p.y;
+        if (p.y > maxY) maxY = p.y;
+      });
+
+      const geomW = maxX - minX;
+      const geomH = maxY - minY;
+
+      const padding = 70;
+      const availW = Math.max(1, canvasW - padding * 2);
+      const top = State.mode === 'euclid' ? Math.max(padding, euclidBanner.offsetHeight + 70) : padding;
+      const availH = Math.max(1, canvasH - top - padding);
+
+      const scale = Math.min(availW / geomW, availH / geomH);
+
+      // 중심 정렬
+      const geomCenterX = (minX + maxX) / 2;
+      const geomCenterY = (minY + maxY) / 2;
+
+      // 캔버스 좌표계 (y는 아래로 증가하므로 -y 변환)
+      function toScreen(gx, gy) {
+        const sx = canvasW / 2 + (gx - geomCenterX) * scale;
+        const sy = top + availH / 2 - (gy - geomCenterY) * scale;
+        return { x: sx, y: sy };
+      }
+
+      return {
+        scale,
+        toScreen,
+        C: toScreen(0, 0),
+        B: toScreen(-a, 0),
+        A: toScreen(0, b),
+        // a^2 정사각형 (초록/청록: 밑변 a 외부 아래쪽)
+        sqA: [
+          toScreen(-a, 0),
+          toScreen(0, 0),
+          toScreen(0, -a),
+          toScreen(-a, -a)
+        ],
+        // b^2 정사각형 (주황: 높이 b 외부 오른쪽)
+        sqB: [
+          toScreen(0, 0),
+          toScreen(b, 0),
+          toScreen(b, b),
+          toScreen(0, b)
+        ],
+        // c^2 정사각형 (보라: 빗변 c 외부 왼쪽 위)
+        sqC: [
+          toScreen(-a, 0),
+          toScreen(-a - b, a),
+          toScreen(-b, a + b),
+          toScreen(0, b)
+        ]
+      };
+    }
+
+    /* ========================================================
+       5. 캔버스 렌더링 루프
+       ======================================================== */
+    let waveOffset = 0;
+
+    function render() {
+      ctx.clearRect(0, 0, canvasW, canvasH);
+      if (State.mode === 'puzzle') {
+        renderPuzzleMode();
+      } else if (State.mode === 'euclid') {
+        renderEuclidMode(computeGeometry());
+      } else {
+        renderWaterMode();
+      }
+
+      // 애니메이션 업데이트 (물 붓기)
+      if (State.isPouring) {
+        if (State.waterDirection === 1) {
+          State.waterProgress += 0.02;
+          if (State.waterProgress >= 1) {
+            State.waterProgress = 1;
+            State.isPouring = false;
+            onWaterFillComplete();
+          }
+        } else {
+          State.waterProgress -= 0.025;
+          if (State.waterProgress <= 0) {
+            State.waterProgress = 0;
+            State.isPouring = false;
+            updatePourButtonUI();
+          }
+        }
+      }
+
+      waveOffset += 0.05;
+      animFrameId = requestAnimationFrame(render);
+    }
+
+    /* 5-1. 기본 직각삼각형 렌더링 */
+    function renderBaseTriangle(geom) {
+      const { A, B, C } = geom;
+
+      // 삼각형 채우기
+      ctx.beginPath();
+      ctx.moveTo(C.x, C.y);
+      ctx.lineTo(B.x, B.y);
+      ctx.lineTo(A.x, A.y);
+      ctx.closePath();
+      ctx.fillStyle = '#f8fafc';
+      ctx.fill();
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = '#334155';
+      ctx.stroke();
+
+      // 직각 표시 기호 (직각 C가 오른쪽에 있으므로 왼쪽 위 방향으로 사각형 표시)
+      const rSize = 14;
+      ctx.beginPath();
+      ctx.moveTo(C.x - rSize, C.y);
+      ctx.lineTo(C.x - rSize, C.y - rSize);
+      ctx.lineTo(C.x, C.y - rSize);
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = '#ef4444';
+      ctx.stroke();
+
+      // 변 길이 레이블
+      drawLabel(`a = ${State.a}`, (C.x + B.x) / 2, C.y + 16, '#0284c7', 13);
+      drawLabel(`b = ${State.b}`, C.x + 24, (C.y + A.y) / 2, '#ea580c', 13);
+      
+      const midAB = { x: (A.x + B.x) / 2, y: (A.y + B.y) / 2 };
+      // 빗변 안쪽에 라벨
+      drawLabel(`c = ${State.c.toFixed(1)}`, midAB.x - 14, midAB.y - 12, '#7c3aed', 13);
+
+      // 꼭짓점 점 표시
+      [C, B, A].forEach((p, i) => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+        ctx.fillStyle = '#1e293b';
+        ctx.fill();
+      });
+    }
+
+    function drawLabel(text, x, y, color, size = 12, isBold = true) {
+      ctx.save();
+      ctx.font = `${isBold ? 'bold ' : ''}${size}px -apple-system, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = color;
+      ctx.fillText(text, x, y);
+      ctx.restore();
+    }
+
+    /* 5-2. 모드 1: 물 채우기 렌더링 */
+    const waterA = { fill: '#38bdf8', stroke: '#0284c7' };
+    const waterB = { fill: '#fb923c', stroke: '#ea580c' };
+    const waterCases = [
+      { angle: 30, title: '30° · 예각' },
+      { angle: 90, title: '90° · 직각' },
+      { angle: 120, title: '120° · 둔각' }
+    ];
+
+    function getWaterTriangle(angle) {
+      const radians = angle * Math.PI / 180;
+      const A = { x: -State.b * Math.cos(radians), y: -State.b * Math.sin(radians) };
+      const B = { x: -State.a, y: 0 };
+      const C = { x: 0, y: 0 };
+
+      // 삼각형의 바깥쪽으로 각 변에 정사각형을 세운다.
+      function square(start, end) {
+        const dx = end.x - start.x;
+        const dy = end.y - start.y;
+        return [
+          start,
+          { x: start.x + dy, y: start.y - dx },
+          { x: end.x + dy, y: end.y - dx },
+          end
+        ];
+      }
+      const sqA = square(C, B);
+      const sqB = square(A, C);
+      const sqC = square(B, A);
+      const points = [...sqA, ...sqB, ...sqC];
+      const xs = points.map(p => p.x);
+      const ys = points.map(p => p.y);
+      const left = Math.min(...xs);
+      const top = Math.min(...ys);
+      return {
+        A, B, C, sqA, sqB, sqC, left, top,
+        width: Math.max(...xs) - left,
+        height: Math.max(...ys) - top,
+        capacity: angle === 90 ? State.c2 : (A.x - B.x) ** 2 + (A.y - B.y) ** 2
+      };
+    }
+
+    function getWaterAmounts(capacity, progress) {
+      const sent = State.c2 * progress;
+      return {
+        level: Math.min(1, sent / capacity),
+        overflow: Math.max(0, sent - capacity),
+        empty: Math.max(0, capacity - sent)
+      };
+    }
+
+    function renderWaterMode() {
+      const models = waterCases.map(({ angle }) => getWaterTriangle(angle));
+      const column = canvasW / models.length;
+      const top = 96;
+      const bottom = 116;
+      const height = Math.max(...models.map(model => model.height));
+      const width = Math.max(...models.map(model => model.width));
+      // 같은 길이의 변이 세 그림에서 화면상으로도 같은 길이가 되게 한다.
+      const scale = Math.min(Math.max(1, column - 20) / width, Math.max(1, canvasH - top - bottom) / height);
+      const y = Math.max(top, (canvasH - bottom + top - height * scale) / 2);
+      drawLabel(`세 삼각형의 공통 길이   a = ${State.a}   b = ${State.b}`, canvasW / 2, y - 46, '#334155', 12);
+
+      models.forEach((model, index) => {
+        const { angle, title } = waterCases[index];
+        const x = column * (index + 0.5);
+        const toScreen = p => ({
+          x: x + (p.x - model.left - model.width / 2) * scale,
+          y: y + (p.y - model.top + (height - model.height) / 2) * scale
+        });
+        const geom = {
+          A: toScreen(model.A), B: toScreen(model.B), C: toScreen(model.C),
+          sqA: model.sqA.map(toScreen), sqB: model.sqB.map(toScreen), sqC: model.sqC.map(toScreen)
+        };
+        const { level, overflow, empty } = getWaterAmounts(model.capacity, State.waterProgress);
+        drawLabel(title, x, y - 20, '#1e293b', 13);
+        renderWaterTriangle(geom, level, angle);
+
+        const captionY = y + height * scale + 18;
+        const c = Number(Math.sqrt(model.capacity).toFixed(2));
+        drawLabel(`c = ${c}`, x, captionY, '#6d28d9', 12);
+        if (overflow > 0) {
+          const barWidth = Math.min(94, column - 12) * overflow / State.c2;
+          const blueWidth = barWidth * State.a2 / State.c2;
+          ctx.save();
+          ctx.fillStyle = waterA.fill;
+          ctx.fillRect(x - barWidth / 2, captionY + 13, blueWidth, 5);
+          ctx.fillStyle = waterB.fill;
+          ctx.fillRect(x - barWidth / 2 + blueWidth, captionY + 13, barWidth - blueWidth, 5);
+          ctx.restore();
+          drawLabel(`넘친 물 ${Number(overflow.toFixed(1))}`, x, captionY + 29, '#9a3412', 11);
+        } else if (State.waterProgress === 1) {
+          const status = empty > 0 ? `빈 공간 ${Number(empty.toFixed(1))}` : '빈틈없이 채움';
+          drawLabel(status, x, captionY + 29, empty > 0 ? '#6d28d9' : '#047857', 11);
+        }
+      });
+    }
+
+    function renderWaterTriangle(geom, level, angle) {
+      const { A, B, C, sqA, sqB, sqC } = geom;
+      drawPolygon(sqA, '#f0f9ff', waterA.stroke, 1.5);
+      drawPolygon(sqB, '#fff7ed', waterB.stroke, 1.5);
+      drawPolygon(sqC, '#faf5ff', '#7c3aed', 1.5);
+
+      const remaining = 1 - State.waterProgress;
+      if (remaining > 0) {
+        drawWaterRegion(getWaterBand(sqA, remaining), waterA);
+        drawWaterRegion(getWaterBand(sqB, remaining), waterB);
+      }
+      if (level > 0) fillHypotSquareWater(sqC, level);
+
+      drawPolygon([A, B, C], '#fff', '#334155', 1.5);
+      const radians = angle * Math.PI / 180;
+      const radius = Math.min(12, Math.hypot(B.x - C.x, B.y - C.y) / 3, Math.hypot(A.x - C.x, A.y - C.y) / 3);
+      ctx.save();
+      ctx.strokeStyle = '#e11d48';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(C.x, C.y, radius, Math.PI, Math.PI + radians);
+      ctx.stroke();
+      ctx.restore();
+
+      if (State.isPouring && level > 0) renderWaterFlowLines(geom, level);
+      [
+        [sqA, 'a²', '#075985'], [sqB, 'b²', '#9a3412'], [sqC, 'c²', '#5b21b6']
+      ].forEach(([square, label, color]) => {
+        if (Math.hypot(square[1].x - square[0].x, square[1].y - square[0].y) < 16) return;
+        const center = getPolygonCenter(square);
+        drawLabel(label, center.x, center.y, color, 11);
+      });
+    }
+
+    function drawPolygon(pts, fill, stroke, width = 2) {
+      ctx.beginPath();
+      ctx.moveTo(pts[0].x, pts[0].y);
+      for (let i = 1; i < pts.length; i++) {
+        ctx.lineTo(pts[i].x, pts[i].y);
+      }
+      ctx.closePath();
+      if (fill) {
+        ctx.fillStyle = fill;
+        ctx.fill();
+      }
+      if (stroke) {
+        ctx.lineWidth = width;
+        ctx.strokeStyle = stroke;
+        ctx.stroke();
+      }
+    }
+
+    function getPolygonCenter(pts) {
+      let cx = 0, cy = 0;
+      pts.forEach(p => { cx += p.x; cy += p.y; });
+      return { x: cx / pts.length, y: cy / pts.length };
+    }
+
+    function getWaterBand(sq, level) {
+      const [start, outerStart, outerEnd, end] = sq;
+      return [start, interpolateWaterPoint(start, outerStart, level),
+        interpolateWaterPoint(end, outerEnd, level), end];
+    }
+
+    function interpolateWaterPoint(from, to, ratio) {
+      return {
+        x: from.x + (to.x - from.x) * ratio,
+        y: from.y + (to.y - from.y) * ratio
+      };
+    }
+
+    function getHypotWaterRegions(sq, level) {
+      const [B, topB, topA, A] = getWaterBand(sq, level);
+      const ratio = State.a2 / State.c2;
+      const dividerBase = interpolateWaterPoint(B, A, ratio);
+      const dividerTop = interpolateWaterPoint(topB, topA, ratio);
+      return [
+        [B, topB, dividerTop, dividerBase],
+        [dividerBase, dividerTop, topA, A]
+      ];
+    }
+
+    function drawWaterRegion(region, color) {
+      drawPolygon(region, color.fill);
+      ctx.save();
+      ctx.strokeStyle = color.stroke;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(region[1].x, region[1].y);
+      ctx.lineTo(region[2].x, region[2].y);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function fillHypotSquareWater(sq, level) {
+      const [blue, orange] = getHypotWaterRegions(sq, level);
+      // 두 색 사이에 배경색 틈이 생기지 않도록 파랑 위에 주황 영역을 덮는다.
+      drawPolygon([blue[0], blue[1], orange[2], orange[3]], waterA.fill);
+      drawPolygon(orange, waterB.fill);
+
+      drawWaterRegion(blue, waterA);
+      drawWaterRegion(orange, waterB);
+    }
+
+    /* 물 붓기 애니메이션 중 흐르는 물줄기 */
+    function renderWaterFlowLines(geom, level) {
+      const { B, A, sqA, sqB, sqC } = geom;
+      const [blue, orange] = getHypotWaterRegions(sqC, level);
+      ctx.save();
+      ctx.globalAlpha = 0.8;
+      ctx.lineWidth = 2.5;
+      ctx.setLineDash([5, 4]);
+      ctx.lineDashOffset = -waveOffset * 10 * State.waterDirection;
+
+      [
+        { source: sqA, control: B, target: blue, color: waterA },
+        { source: sqB, control: A, target: orange, color: waterB }
+      ].forEach(({ source, control, target, color }) => {
+        const from = getPolygonCenter(source);
+        const to = getPolygonCenter(target);
+        ctx.strokeStyle = color.stroke;
+        ctx.beginPath();
+        ctx.moveTo(from.x, from.y);
+        ctx.quadraticCurveTo(control.x, control.y, to.x, to.y);
+        ctx.stroke();
+      });
+      ctx.restore();
+    }
+
+    /* 5-3. 모드 2: 퍼즐맞추기 렌더링 */
+    function initPuzzlePieces() {
+      if (State.mode === 'puzzle' && State.puzzleSolved) showPuzzlePrompt();
+      State.puzzlePieces = ['#38bdf8', '#0284c7', '#fb923c', '#ea580c'].map((color, slot) => ({
+        slot, color, w: State.a, h: State.b
+      }));
+      resetPuzzlePieces();
+    }
+
+    function getPuzzleLayout() {
+      const gap = 28;
+      const top = 82;
+      const availableHeight = Math.max(1, canvasH - top - 72);
+      const stacked = canvasW < 410 && availableHeight >= canvasW * 1.2;
+      const side = Math.max(1, Math.min(
+        stacked ? canvasW - 24 : (canvasW - gap - 24) / 2,
+        stacked ? (availableHeight - gap) / 2 : availableHeight
+      ));
+      const left = (canvasW - (stacked ? side : 2 * side + gap)) / 2;
+      const y = top + (availableHeight - (stacked ? 2 * side + gap : side)) / 2;
+      return {
+        side,
+        scale: side / (State.a + State.b),
+        source: { x: left, y },
+        target: stacked ? { x: left, y: y + side + gap } : { x: left + side + gap, y }
+      };
+    }
+
+    function getPuzzleTarget(piece, layout) {
+      const dx = (piece.w * layout.scale - layout.side) / 2;
+      const dy = (layout.side - piece.h * layout.scale) / 2;
+      const offsets = [[dx, dy], [-dy, dx], [-dx, -dy], [dy, -dx]];
+      const [x, y] = offsets[piece.slot];
+      return {
+        center: { x: layout.target.x + layout.side / 2 + x, y: layout.target.y + layout.side / 2 + y },
+        rot: piece.slot * 90
+      };
+    }
+
+    function getPuzzleHome(piece, layout) {
+      const { source, side, scale } = layout;
+      const a = piece.w * scale;
+      const b = piece.h * scale;
+      return piece.slot % 2 === 0
+        ? { x: source.x + a / 2, y: source.y + side - b / 2 }
+        : { x: source.x + side - b / 2, y: source.y + a / 2 };
+    }
+
+    function resetPuzzlePieces() {
+      const layout = getPuzzleLayout();
+      State.selectedPiece = null;
+      State.draggedPiece = null;
+      State.lastClickedPiece = null;
+      State.puzzleSolved = false;
+      State.puzzleDiscovered = false;
+      State.puzzlePieces.forEach(p => {
+        p.current = getPuzzleHome(p, layout);
+        p.rot = p.slot * 90;
+        p.placed = false;
+      });
+    }
+
+    function drawPuzzleTriangle(piece, center, rot, scale, fill, stroke) {
+      const w = piece.w * scale / 2;
+      const h = piece.h * scale / 2;
+      ctx.save();
+      ctx.translate(center.x, center.y);
+      ctx.rotate(rot * Math.PI / 180);
+      drawPolygon([{x: -w, y: h}, {x: w, y: h}, {x: -w, y: -h}], fill, stroke, 1.5);
+      ctx.restore();
+    }
+
+    function renderPuzzleMode() {
+      const layout = getPuzzleLayout();
+      const { source, target, side, scale } = layout;
+      const a = State.a * scale;
+      const b = State.b * scale;
+      const box = (x, y, width, fill) => drawPolygon([
+        {x, y}, {x: x + width, y}, {x: x + width, y: y + width}, {x, y: y + width}
+      ], fill, '#64748b', 1.5);
+
+      box(source.x, source.y, side, '#f1f5f9');
+      box(target.x, target.y, side, '#f1f5f9');
+      box(source.x, source.y, a, '#bae6fd');
+      box(source.x + a, source.y + a, b, '#fed7aa');
+      const complete = State.puzzlePieces.every(p => p.placed);
+      if (complete) {
+        drawPolygon([
+          {x: target.x, y: target.y + a},
+          {x: target.x + b, y: target.y},
+          {x: target.x + side, y: target.y + b},
+          {x: target.x + a, y: target.y + side}
+        ], '#ede9fe', '#7c3aed', 1.5);
+      }
+      if (State.puzzleDiscovered) {
+        drawLabel('a²', source.x + a / 2, source.y + a / 2, '#075985', 14, true);
+        drawLabel('b²', source.x + a + b / 2, source.y + a + b / 2, '#9a3412', 14, true);
+      }
+      drawLabel('재배치 전', source.x + side / 2, source.y - 12, '#334155', 13, true);
+      drawLabel('재배치 후', target.x + side / 2, target.y - 12, '#334155', 13, true);
+
+      // 각 점선은 같은 색 조각이 들어갈 자리를 나타낸다.
+      ctx.save();
+      ctx.setLineDash([4, 4]);
+      State.puzzlePieces.forEach(p => {
+        drawPuzzleTriangle(p, getPuzzleHome(p, layout), p.slot * 90, scale, '#e2e8f0', '#94a3b8');
+        const { center, rot } = getPuzzleTarget(p, layout);
+        drawPuzzleTriangle(p, center, rot, scale, null, p.color);
+      });
+      ctx.restore();
+
+      State.puzzlePieces.forEach(p => {
+        drawPuzzleTriangle(p, p.current, p.rot, scale, p.color, State.selectedPiece === p ? '#312e81' : '#fff');
+      });
+
+      if (complete) {
+        const center = { x: target.x + side / 2, y: target.y + side / 2 };
+        if (State.puzzleDiscovered) {
+          drawLabel('c²', center.x, center.y, '#6d28d9', 20, true);
+        }
+        if (!State.puzzleSolved) {
+          State.puzzleSolved = true;
+          canvasHint.textContent = '회색은 조각이 있던 자리예요. 색칠 영역을 살펴보고 피타 쌤 아래의 질문에 답해 보세요.';
+          setTutorSpeech("조각을 모두 옮겼어! 옮기기 전에는 파랑과 주황 정사각형, 옮긴 뒤에는 보라 정사각형이 남아. 두 판을 보면서 아래 질문에 답해 봐.");
+          showPuzzleQuestion(0);
+        }
+      }
+    }
+
+    /* 5-4. 모드 3: 증명해보기 */
+    function renderEuclidMode(geom) {
+      const { A, B, C, sqA, sqB, sqC } = geom;
+      const step = State.euclidStep;
+      const t = Math.min(1, Math.max(0, (performance.now() - State.euclidStartedAt) / 1500));
+      const lerp = (p, q, progress) => ({
+        x: p.x + (q.x - p.x) * progress,
+        y: p.y + (q.y - p.y) * progress
+      });
+      const ratio = State.a2 / State.c2;
+      const H = lerp(B, A, ratio);
+      const Hout = lerp(sqC[1], sqC[2], ratio);
+
+      drawPolygon(sqA, '#f0f9ff', '#0284c7', 1.5);
+      drawPolygon(sqB, '#fff7ed', '#ea580c', 1.5);
+      drawPolygon(sqC, '#faf5ff', '#7c3aed', 2);
+      if (step === 2 && t === 1) {
+        drawPolygon([B, sqC[1], Hout, H], '#bae6fd', '#0284c7', 1.5);
+        drawPolygon([A, sqC[2], Hout, H], '#fed7aa', '#ea580c', 1.5);
+      }
+
+      // 색칠된 삼각형을 그리기 전에 흰색 삼각형과 보조선을 그린다.
+      renderBaseTriangle(geom);
+      ctx.save();
+      ctx.strokeStyle = '#a855f7';
+      ctx.setLineDash([5, 5]);
+      ctx.beginPath();
+      ctx.moveTo(C.x, C.y);
+      ctx.lineTo(Hout.x, Hout.y);
+      ctx.stroke();
+      ctx.restore();
+
+      [
+        { pivot: B, corner: sqA[3], opposite: A, outer: sqC[1], direction: -1, color: '#38bdf8' },
+        { pivot: A, corner: sqB[2], opposite: B, outer: sqC[2], direction: 1, color: '#fb923c' }
+      ].forEach(({ pivot, corner, opposite, outer, direction, color }) => {
+        if (step === 0) {
+          drawTransformedTriangle(pivot, corner, lerp(C, opposite, t), color);
+        } else if (step === 1) {
+          const angle = direction * Math.PI / 2 * t;
+          const rotate = point => {
+            const x = point.x - pivot.x;
+            const y = point.y - pivot.y;
+            return {
+              x: pivot.x + x * Math.cos(angle) - y * Math.sin(angle),
+              y: pivot.y + x * Math.sin(angle) + y * Math.cos(angle)
+            };
+          };
+          drawTransformedTriangle(pivot, rotate(corner), rotate(opposite), color);
+        } else {
+          drawTransformedTriangle(pivot, outer, lerp(C, H, t), color);
+        }
+      });
+    }
+
+    function drawTransformedTriangle(p1, p2, p3, color) {
+      ctx.save();
+      ctx.fillStyle = color;
+      ctx.globalAlpha = 0.65;
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(p1.x, p1.y);
+      ctx.lineTo(p2.x, p2.y);
+      ctx.lineTo(p3.x, p3.y);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    /* ========================================================
+       6. 인터랙션 및 이벤트 바인딩
+       ======================================================== */
+    // DOM 요소 캐시
+    const sliderA = document.getElementById('sliderA');
+    const sliderB = document.getElementById('sliderB');
+    const valBoxA = document.getElementById('valBoxA');
+    const valBoxB = document.getElementById('valBoxB');
+    const valBoxC = document.getElementById('valBoxC');
+    const tutorSpeech = document.getElementById('tutorSpeech');
+    const btnPourWater = document.getElementById('btnPourWater');
+    const pourWaterText = document.getElementById('pourWaterText');
+    const pourWaterIcon = document.getElementById('pourWaterIcon');
+    const btnRecordData = document.getElementById('btnRecordData');
+    const dataTableBody = document.getElementById('dataTableBody');
+    const recordBadge = document.getElementById('recordBadge');
+    const btnSnapToggle = document.getElementById('btnSnapToggle');
+    const snapIndicator = document.getElementById('snapIndicator');
+    const canvasHint = document.getElementById('canvasHint');
+    const euclidBanner = document.getElementById('euclidBanner');
+
+    // 모드 탭 전환 (모드별 하단 안내 문구 및 도구 동적 전환)
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        State.mode = btn.dataset.mode;
+        if (State.mode !== 'puzzle') puzzleDiscovery.hidden = true;
+        Sound.click();
+
+        // 툴바 전환
+        document.getElementById('btnPourWater').style.display = (State.mode === 'water') ? 'flex' : 'none';
+        document.getElementById('puzzleTools').style.display = (State.mode === 'puzzle') ? 'flex' : 'none';
+
+        if (State.mode === 'water') {
+          if (euclidBanner) euclidBanner.style.display = 'none';
+          canvasHint.innerHTML = '물 붓기를 누르고 두 변 사이의 각에 따라 물이 얼마나 차는지 비교해 보세요.';
+          setTutorSpeech("직각삼각형의 변을 조절해보고, 세 정사각형의 넓이에 어떤 비밀이 숨어있는지 탐구해보자!");
+        } else if (State.mode === 'puzzle') {
+          if (euclidBanner) euclidBanner.style.display = 'none';
+          initPuzzlePieces();
+          showPuzzlePrompt();
+        } else if (State.mode === 'euclid') {
+          if (euclidBanner) euclidBanner.style.display = 'flex';
+          canvasHint.textContent = '단계 버튼을 누르면 그 단계의 움직임을 다시 볼 수 있어요.';
+          setTutorSpeech("색칠된 삼각형이 움직이는 동안 무엇이 그대로인지 살펴보고, 보기에서 골라 빈칸을 채워봐!");
+          selectProofStep(0);
+        }
+      });
+    });
+
+    // 슬라이더 변경 핸들러 (오직 슬라이더 조정만 수행, 자동 표 기록 완전 제거)
+    function onSliderChange() {
+      let newA = parseInt(sliderA.value, 10);
+      let newB = parseInt(sliderB.value, 10);
+
+      // 스냅 모드일 때 가장 가까운 피타고라스 삼쌍으로 착 달라붙음
+      if (State.snapTriples) {
+        let bestDist = Infinity;
+        let bestTriple = null;
+        State.triplets.forEach(t => {
+          const dist = Math.hypot(t.a - newA, t.b - newB);
+          if (dist < bestDist) {
+            bestDist = dist;
+            bestTriple = t;
+          }
+        });
+
+        if (bestTriple && bestDist <= 2.2) {
+          if (newA !== bestTriple.a || newB !== bestTriple.b) {
+            newA = bestTriple.a;
+            newB = bestTriple.b;
+            sliderA.value = newA;
+            sliderB.value = newB;
+            Sound.snap();
+          }
+        }
+      }
+
+      State.a = newA;
+      State.b = newB;
+      updateSliderUI();
+      checkMissions();
+      Sound.click();
+    }
+
+    sliderA.addEventListener('input', onSliderChange);
+    sliderB.addEventListener('input', onSliderChange);
+
+    function updateSliderUI() {
+      valBoxA.textContent = `a = ${State.a} (a² = ${State.a2})`;
+      valBoxB.textContent = `b = ${State.b} (b² = ${State.b2})`;
+      valBoxC.textContent = `c = ${State.c.toFixed(1)} (c² = ${State.c2.toFixed(0)})`;
+
+      // 퀵 버튼 활성화 표시
+      document.querySelectorAll('.triplet-btn').forEach(btn => {
+        const btnA = parseInt(btn.dataset.a, 10);
+        const btnB = parseInt(btn.dataset.b, 10);
+        btn.classList.toggle('active', btnA === State.a && btnB === State.b);
+      });
+
+      // 물 채우기 상태 리셋 (물이 차있었다면 자연스럽게 리셋)
+      if (State.waterProgress > 0) {
+        State.waterProgress = 0;
+        State.isPouring = false;
+        updatePourButtonUI();
+      }
+      initPuzzlePieces();
+    }
+
+    // 대표 삼쌍 퀵 버튼 클릭 (간접적 탐구 발문)
+    document.querySelectorAll('.triplet-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const a = parseInt(btn.dataset.a, 10);
+        const b = parseInt(btn.dataset.b, 10);
+        sliderA.value = a;
+        sliderB.value = b;
+        State.a = a;
+        State.b = b;
+        updateSliderUI();
+        Sound.snap();
+        checkMissions();
+        setTutorSpeech(`a=${a}, b=${b}, c=${Math.round(Math.hypot(a, b))} 직각삼각형이 되었어! 각 변에 연결된 정사각형들의 넓이를 눈여겨보자.`);
+      });
+    });
+
+    // 스냅 토글 스위치 ('자연수 c ON/OFF')
+    btnSnapToggle.addEventListener('click', () => {
+      State.snapTriples = !State.snapTriples;
+      snapIndicator.textContent = State.snapTriples ? '🧲 자연수 c ON' : '🔓 자연수 c OFF';
+      btnSnapToggle.style.background = State.snapTriples ? '#eef2ff' : '#f1f5f9';
+      Sound.click();
+      setTutorSpeech(State.snapTriples ? 
+        '빗변 c가 자연수가 되도록 맞췄어! 넓이들의 관계를 더 쉽게 비교해볼 수 있을 거야.' : 
+        '자유롭게 삼각형 크기를 조절하며 탐구해봐!');
+    });
+
+    // 물 붓기 / 비우기 버튼
+    btnPourWater.addEventListener('click', () => {
+      if (State.isPouring) return;
+      State.isPouring = true;
+      if (State.waterProgress < 0.5) {
+        State.waterDirection = 1; // pour into c
+        Sound.splash();
+        setTutorSpeech("세 삼각형에서 같은 양의 파란 물과 주황 물을 보내고 있어. 두 변 사이의 각에 따라 물이 얼마나 차는지 비교해 봐!");
+      } else {
+        State.waterDirection = -1; // return
+        Sound.splash();
+      }
+      updatePourButtonUI();
+    });
+
+    function updatePourButtonUI() {
+      if (State.waterProgress >= 0.99) {
+        pourWaterText.textContent = '원위치로 되돌리기';
+        pourWaterIcon.textContent = '🔄';
+      } else {
+        pourWaterText.textContent = '물 붓기 시뮬레이션';
+        pourWaterIcon.textContent = '💧';
+      }
+    }
+
+    function onWaterFillComplete() {
+      updatePourButtonUI();
+      Sound.fanfare();
+      setTutorSpeech("파란 물은 a², 주황 물은 b²에서 왔어. 30°에서는 물이 넘치고, 90°에서는 딱 맞고, 120°에서는 빈 공간이 남아. 보낸 물의 양은 같은데 결과가 왜 다를까?");
+    }
+
+    const proofSteps = [
+      {
+        title: '1단계 · 꼭짓점 옮기기',
+        lines: ['꼭짓점이 고정된 밑변과 ', '인 직선 위를 움직여요. 밑변과 높이가 그대로이므로 삼각형의 ', '도 같아요.'],
+        answers: ['평행', '넓이'],
+        choices: ['수직', '둘레', '평행', '넓이']
+      },
+      {
+        title: '2단계 · 꼭짓점을 중심으로 돌리기',
+        lines: ['색칠된 삼각형을 ', ' 돌렸어요. 두 변의 길이와 끼인각이 유지되므로 돌리기 전후 삼각형은 서로 ', ' 관계예요.'],
+        answers: ['90°', '합동'],
+        choices: ['45°', '합동', '90°', '대칭']
+      },
+      {
+        title: '3단계 · 빗변 정사각형 안으로 옮기기',
+        lines: ['삼각형의 넓이는 옮기기 전후에 같아요. 각 삼각형은 대응하는 작은 정사각형과 빗변 쪽 직사각형에서 각각 넓이의 ', '이에요. 따라서 두 직사각형의 넓이를 더하면 ', '이 돼요.'],
+        answers: ['절반', 'a² + b² = c²'],
+        choices: ['전체', 'a + b = c', '절반', 'a² + b² = c²']
+      }
+    ];
+    const proofButtons = document.querySelectorAll('[data-proof-step]');
+    const proofTitle = document.getElementById('euclidStepTitle');
+    const proofDesc = document.getElementById('euclidStepDesc');
+    const proofChoices = document.getElementById('euclidChoices');
+    const proofFeedback = document.getElementById('euclidFeedback');
+    const proofAnswers = proofSteps.map(() => []);
+
+    function selectProofStep(index) {
+      State.euclidStep = index;
+      State.euclidStartedAt = performance.now();
+      proofButtons.forEach((button, step) => button.setAttribute('aria-pressed', step === index));
+      renderProofQuestion();
+    }
+
+    function renderProofQuestion() {
+      const step = proofSteps[State.euclidStep];
+      const filled = proofAnswers[State.euclidStep];
+      proofTitle.textContent = step.title;
+      proofDesc.replaceChildren();
+      step.lines.forEach((line, index) => {
+        proofDesc.append(line);
+        if (index < step.answers.length) {
+          const blank = document.createElement('span');
+          blank.className = 'proof-blank';
+          blank.textContent = filled[index] || `빈칸 ${index + 1}`;
+          proofDesc.append(blank);
+        }
+      });
+      proofChoices.replaceChildren();
+      const complete = filled.length === step.answers.length;
+      proofFeedback.textContent = complete ? '모든 빈칸을 채웠어요.' : `빈칸 ${filled.length + 1}에 넣을 보기를 골라보세요.`;
+      if (complete) return;
+
+      step.choices.forEach(choice => {
+        const button = document.createElement('button');
+        button.className = 'symbol-chip';
+        button.textContent = choice;
+        button.addEventListener('click', () => {
+          if (choice === step.answers[filled.length]) {
+            filled.push(choice);
+            renderProofQuestion();
+            proofChoices.querySelector('button')?.focus();
+          } else {
+            proofFeedback.textContent = '애니메이션을 보고 다른 보기를 골라보세요.';
+          }
+        });
+        proofChoices.append(button);
+      });
+    }
+
+    proofButtons.forEach((button, index) => {
+      button.addEventListener('click', () => selectProofStep(index));
+    });
+
+    const puzzleDiscovery = document.getElementById('puzzleDiscovery');
+    const puzzleQuestion = document.getElementById('puzzleQuestion');
+    const puzzleChoices = document.getElementById('puzzleChoices');
+    const puzzleFeedback = document.getElementById('puzzleFeedback');
+    const puzzleQuestions = [
+      {
+        prompt: '옮기기 전과 후에 삼각형 네 조각이 덮는 넓이는 어떻게 될까요?',
+        choices: ['그대로예요', '달라져요'],
+        answer: 0,
+        hint: '조각을 옮기는 동안 조각을 자르거나 크기를 바꿨는지 살펴보세요.'
+      },
+      {
+        prompt: '두 판의 전체 넓이도, 조각이 덮는 넓이도 같아요. 남은 파랑과 주황을 합한 넓이는 보라색 넓이와 어떻게 비교될까요?',
+        choices: ['더 작아요', '같아요', '더 커요'],
+        answer: 1,
+        hint: '크기가 같은 두 판에서 같은 넓이를 빼면 각각 얼마나 남을까요?'
+      }
+    ];
+
+    function showPuzzlePrompt() {
+      puzzleDiscovery.hidden = true;
+      canvasHint.textContent = '삼각형을 같은 색 점선으로 옮겨 보세요. [자동맞춤]은 조각 옮기기를 도와줘요.';
+      setTutorSpeech("크기가 같은 두 판이 있어. 첫 번째 판의 삼각형 네 조각을 두 번째 판으로 옮겨 봐. 조각이 덮지 않은 색칠 영역이 어떻게 달라지는지 살펴보자!");
+    }
+
+    function showPuzzleQuestion(index) {
+      const question = puzzleQuestions[index];
+      puzzleDiscovery.hidden = false;
+      puzzleQuestion.textContent = question.prompt;
+      puzzleFeedback.textContent = '';
+      puzzleChoices.replaceChildren();
+      question.choices.forEach((choice, choiceIndex) => {
+        const button = document.createElement('button');
+        button.className = 'symbol-chip';
+        button.textContent = choice;
+        button.addEventListener('click', () => {
+          if (choiceIndex !== question.answer) {
+            puzzleFeedback.textContent = question.hint;
+          } else if (index + 1 < puzzleQuestions.length) {
+            showPuzzleQuestion(index + 1);
+            puzzleChoices.querySelector('button').focus();
+          } else {
+            State.puzzleDiscovered = true;
+            puzzleChoices.replaceChildren();
+            puzzleQuestion.textContent = '발견! 파랑과 주황을 합한 넓이는 보라색 넓이와 같아요.';
+            puzzleFeedback.textContent = '직각을 이루는 두 변의 길이가 a, b라면 파랑과 주황 정사각형의 넓이는 각각 a², b²예요. 빗변의 길이가 c라면 보라 정사각형의 넓이는 c²예요. 그래서 a² + b² = c². 이것이 피타고라스 정리예요!';
+            canvasHint.textContent = '파랑 넓이 + 주황 넓이 = 보라 넓이   |   a² + b² = c²';
+            const { target, side } = getPuzzleLayout();
+            Sound.fanfare();
+            triggerConfetti(target.x + side / 2, target.y + side / 2, 60);
+          }
+        });
+        puzzleChoices.append(button);
+      });
+    }
+
+    // 퍼즐 조각 90도 회전 함수
+    function rotatePiece(p) {
+      if (!p || p.placed) return;
+      p.rot = ((p.rot || 0) + 90) % 360;
+      Sound.snap();
+    }
+
+    // 툴바의 90도 회전 버튼
+    const btnRotatePiece = document.getElementById('btnRotatePiece');
+    if (btnRotatePiece) {
+      btnRotatePiece.addEventListener('click', () => {
+        if (State.selectedPiece) {
+          rotatePiece(State.selectedPiece);
+        } else if (State.puzzlePieces.length > 0) {
+          rotatePiece(State.puzzlePieces[State.puzzlePieces.length - 1]);
+        }
+      });
+    }
+
+    // 퍼즐 자동 맞추기 힌트 및 리셋
+    document.getElementById('btnPuzzleHint').addEventListener('click', () => {
+      const layout = getPuzzleLayout();
+      State.selectedPiece = null;
+      State.draggedPiece = null;
+      State.puzzlePieces.forEach(p => {
+        const { center, rot } = getPuzzleTarget(p, layout);
+        p.current = center;
+        p.rot = rot;
+        p.placed = true;
+      });
+    });
+
+    document.getElementById('btnPuzzleReset').addEventListener('click', () => {
+      resetPuzzlePieces();
+      showPuzzlePrompt();
+      Sound.click();
+    });
+
+    /* ========================================================
+       7. 퍼즐맞추기 터치 및 드래그 인터랙션 (누르는 순서 무관 + 더블클릭 회전)
+       ======================================================== */
+    function getPointerPos(e) {
+      const rect = canvas.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      return {
+        x: clientX - rect.left,
+        y: clientY - rect.top
+      };
+    }
+
+    function onPointerDown(e) {
+      if (State.mode !== 'puzzle') return;
+      const pos = getPointerPos(e);
+      const { scale: pScale } = getPuzzleLayout();
+
+      for (let i = State.puzzlePieces.length - 1; i >= 0; i--) {
+        const p = State.puzzlePieces[i];
+        if (p.placed) continue;
+        const angle = p.rot * Math.PI / 180;
+        const dx = pos.x - p.current.x;
+        const dy = pos.y - p.current.y;
+        const x = dx * Math.cos(angle) + dy * Math.sin(angle);
+        const y = -dx * Math.sin(angle) + dy * Math.cos(angle);
+        const insideBounds = Math.abs(x) <= p.w * pScale / 2 && Math.abs(y) <= p.h * pScale / 2;
+        if (insideBounds && y >= x * p.h / p.w) {
+          // 최상단 레이어로 이동 (어떤 조각이든 누르는 순서와 상관없이 즉시 선택 및 조작 가능!)
+          State.puzzlePieces.splice(i, 1);
+          State.puzzlePieces.push(p);
+
+          State.draggedPiece = p;
+          State.selectedPiece = p;
+          State.dragOffset = { x: pos.x - p.current.x, y: pos.y - p.current.y };
+
+          // 더블클릭 또는 더블탭 시 90도 회전
+          const now = Date.now();
+          if (State.lastClickedPiece === p && (now - (State.lastClickTime || 0) < 320)) {
+            rotatePiece(p);
+            State.lastClickTime = 0;
+          } else {
+            State.lastClickTime = now;
+            State.lastClickedPiece = p;
+            Sound.click();
+          }
+          break;
+        }
+      }
+    }
+
+    function onPointerMove(e) {
+      if (!State.draggedPiece) return;
+      const pos = getPointerPos(e);
+      State.draggedPiece.current.x = pos.x - State.dragOffset.x;
+      State.draggedPiece.current.y = pos.y - State.dragOffset.y;
+    }
+
+    function onPointerUp() {
+      if (!State.draggedPiece) return;
+      const p = State.draggedPiece;
+      const layout = getPuzzleLayout();
+      const { center, rot } = getPuzzleTarget(p, layout);
+      const aligned = (p.rot - rot) % 360 === 0;
+      const distance = Math.hypot(p.current.x - center.x, p.current.y - center.y);
+      if (aligned && distance < 22) {
+        p.current = center;
+        p.rot = rot;
+        p.placed = true;
+        State.selectedPiece = null;
+        Sound.snap();
+      }
+      State.draggedPiece = null;
+    }
+
+    canvas.addEventListener('mousedown', onPointerDown);
+    window.addEventListener('mousemove', onPointerMove);
+    window.addEventListener('mouseup', onPointerUp);
+
+    canvas.addEventListener('touchstart', onPointerDown, { passive: true });
+    window.addEventListener('touchmove', onPointerMove, { passive: true });
+    window.addEventListener('touchend', onPointerUp);
+
+    /* ========================================================
+       8. 데이터 표 기록 및 상징화 수식 도출 (오직 버튼 클릭 시에만 기록)
+       ======================================================== */
+    function recordCurrentData(isAuto = false) {
+      const a2 = State.a2;
+      const b2 = State.b2;
+      const sum = a2 + b2;
+      const c2 = Math.round(State.c2);
+
+      const recordItem = {
+        idx: State.records.length + 1,
+        a: State.a,
+        b: State.b,
+        c: State.c,
+        a2: a2,
+        b2: b2,
+        sum: sum,
+        c2: c2
+      };
+      State.records.push(recordItem);
+
+      // 테이블 렌더링
+      const formatValue = value => Number(value.toFixed(2));
+      const tr = document.createElement('tr');
+      tr.className = 'highlight-row';
+      tr.innerHTML = `
+        <td>${recordItem.idx}</td>
+        <td>${recordItem.a}</td>
+        <td>${recordItem.b}</td>
+        <td>${formatValue(recordItem.c)}</td>
+        <td>${recordItem.a * recordItem.b}</td>
+        <td>${formatValue(recordItem.b * recordItem.c)}</td>
+        <td>${formatValue(recordItem.c * recordItem.a)}</td>
+        <td>${recordItem.a2}</td>
+        <td>${recordItem.b2}</td>
+        <td class="val-sum">${recordItem.sum}</td>
+        <td class="val-c2"><span class="val-match">${recordItem.c2}</span></td>
+      `;
+      dataTableBody.appendChild(tr);
+
+      // 스크롤 최하단
+      dataTableBody.parentElement.parentElement.scrollTop = dataTableBody.parentElement.parentElement.scrollHeight;
+
+      recordBadge.textContent = `기록 ${State.records.length}회`;
+      Sound.snap();
+
+      // AI 튜터 간접적 탐구 코칭
+      if (State.records.length === 1) {
+        setTutorSpeech("첫 번째 데이터가 기록되었어! 다른 크기의 직각삼각형도 만들어 [표에 기록하기]를 눌러보자.");
+      } else if (State.records.length === 2) {
+        setTutorSpeech("데이터가 쌓이고 있어! 숫자들 사이에 어떤 덧셈 규칙이 숨어있을까?");
+      } else if (State.records.length >= 3) {
+        checkMissions();
+        setTutorSpeech("표의 숫자들을 찬찬히 살펴볼까? 왼쪽 두 수(a², b²)를 계산하면 오른쪽 수(c²)와 어떻게 연결될까?");
+      }
+    }
+
+    btnRecordData.addEventListener('click', () => {
+      recordCurrentData(false);
+    });
+
+    /* 수식 빈칸 채우기 로직 (오답 시 가리고 '다시 하기' 버튼으로 전환) */
+    const slots = [
+      document.getElementById('slot1'),
+      document.getElementById('slot2'),
+      document.getElementById('slot3')
+    ];
+    const formulaEquationBox = document.getElementById('formulaEquationBox');
+    const formulaErrorBox = document.getElementById('formulaErrorBox');
+    const btnVerifyFormula = document.getElementById('btnVerifyFormula');
+
+    // 칩 클릭 시 빈 슬롯에 자동 채우기
+    document.querySelectorAll('#symbolChipGroup .symbol-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        if (State.isFormulaError) return;
+        const sym = chip.dataset.sym;
+        const emptySlot = slots.find(s => !s.dataset.val);
+        if (emptySlot) {
+          emptySlot.textContent = sym;
+          emptySlot.dataset.val = sym;
+          emptySlot.classList.remove('empty');
+          Sound.click();
+        }
+      });
+    });
+
+    // 슬롯 클릭 시 비우기
+    slots.forEach(slot => {
+      slot.addEventListener('click', () => {
+        if (State.isFormulaError) return;
+        if (slot.dataset.val) {
+          slot.textContent = '?';
+          slot.dataset.val = '';
+          slot.classList.add('empty');
+          Sound.click();
+        }
+      });
+    });
+
+    // 수식 확인 / 다시 하기 버튼
+    btnVerifyFormula.addEventListener('click', () => {
+      // 1) 다시 하기 모드일 때
+      if (State.isFormulaError) {
+        slots.forEach(s => {
+          s.textContent = '?';
+          s.dataset.val = '';
+          s.classList.add('empty');
+        });
+        formulaEquationBox.style.display = 'flex';
+        formulaErrorBox.style.display = 'none';
+        btnVerifyFormula.textContent = '정답 확인하기 ✨';
+        btnVerifyFormula.classList.remove('retry-mode');
+        State.isFormulaError = false;
+        Sound.click();
+        return;
+      }
+
+      // 2) 정답 검증 모드
+      const v1 = slots[0].dataset.val;
+      const v2 = slots[1].dataset.val;
+      const v3 = slots[2].dataset.val;
+
+      // 정답 조건: (a² + b² = c²) 또는 (b² + a² = c²)
+      const isCorrect = (
+        (v1 === 'a²' && v2 === 'b²' && v3 === 'c²') ||
+        (v1 === 'b²' && v2 === 'a²' && v3 === 'c²')
+      );
+
+      if (isCorrect) {
+        State.formulaSolved = true;
+        Sound.fanfare();
+        triggerConfetti(window.innerWidth / 2, window.innerHeight / 2, 100);
+        document.getElementById('achievementCard').style.display = 'block';
+        setTutorSpeech("🎉 대단해! 네가 직접 발견한 식이 바로 직각삼각형의 핵심 정리인 <strong>피타고라스 정리 (a² + b² = c²)</strong>야!");
+        checkMissions();
+      } else {
+        // 오답: 공식 완성 칸 가리고 '오답입니다' 띄우기 & 버튼을 '다시 하기'로 변경
+        State.isFormulaError = true;
+        formulaEquationBox.style.display = 'none';
+        formulaErrorBox.style.display = 'flex';
+        btnVerifyFormula.textContent = '다시 하기';
+        btnVerifyFormula.classList.add('retry-mode');
+        Sound.click();
+        setTutorSpeech("표에서 a² 열과 b² 열의 수를 조합해서 c² 열의 수를 만드는 규칙을 다시 떠올려보자!");
+      }
+    });
+
+    /* ========================================================
+       9. 미니 미션 판정기
+       ======================================================== */
+    function checkMissions() {
+      // 미션 1: 빗변 c = 5 (a=3, b=4)
+      if (Math.abs(State.c - 5) < 0.1) {
+        if (!State.missions.m1) {
+          State.missions.m1 = true;
+          markMissionCompleted('mission1', 'mBadge1');
+        }
+      }
+
+      // 미션 2: a^2 + b^2 = 100 (a=6, b=8)
+      if (State.a2 + State.b2 === 100) {
+        if (!State.missions.m2) {
+          State.missions.m2 = true;
+          markMissionCompleted('mission2', 'mBadge2');
+        }
+      }
+
+      // 미션 3: 데이터 3회 기록 + 공식 완성
+      if (State.records.length >= 3 && State.formulaSolved) {
+        if (!State.missions.m3) {
+          State.missions.m3 = true;
+          markMissionCompleted('mission3', 'mBadge3');
+        }
+      }
+    }
+
+    function markMissionCompleted(itemId, badgeId) {
+      const item = document.getElementById(itemId);
+      const badge = document.getElementById(badgeId);
+      if (item && badge) {
+        item.classList.add('completed');
+        badge.textContent = '✓';
+        Sound.fanfare();
+      }
+    }
+
+    /* AI 튜터 대화 업데이트 헬퍼 */
+    function setTutorSpeech(html) {
+      tutorSpeech.innerHTML = html;
+    }
+
+    /* EIS 단계 뱃지 활성화 헬퍼 */
+    function updateEISStep(stepNum) {
+      const s1 = document.getElementById('stepEnactive');
+      const s2 = document.getElementById('stepIconic');
+      const s3 = document.getElementById('stepSymbolic');
+
+      if (s1) s1.classList.toggle('active', stepNum === 1);
+      if (s2) s2.classList.toggle('active', stepNum === 2);
+      if (s3) s3.classList.toggle('active', stepNum === 3);
+    }
+
+    // 소리 토글 버튼
+    document.getElementById('btnSoundToggle').addEventListener('click', (e) => {
+      State.soundEnabled = !State.soundEnabled;
+      e.target.textContent = State.soundEnabled ? '🔊' : '🔇';
+      if (State.soundEnabled) Sound.click();
+    });
+
+    /* ========================================================
+       10. 축하 Confetti 파티클 애니메이션
+       ======================================================== */
+    const confettiCanvas = document.getElementById('confettiCanvas');
+    const cCtx = confettiCanvas.getContext('2d');
+    let confettiParticles = [];
+
+    function resizeConfetti() {
+      confettiCanvas.width = window.innerWidth;
+      confettiCanvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeConfetti);
+    resizeConfetti();
+
+    function triggerConfetti(startX, startY, count = 50) {
+      const colors = ['#f43f5e', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'];
+      for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 8 + 3;
+        confettiParticles.push({
+          x: startX,
+          y: startY,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed - 4,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          size: Math.random() * 8 + 4,
+          life: 1
+        });
+      }
+    }
+
+    function renderConfetti() {
+      cCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+      for (let i = confettiParticles.length - 1; i >= 0; i--) {
+        const p = confettiParticles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.25; // gravity
+        p.life -= 0.015;
+
+        if (p.life <= 0) {
+          confettiParticles.splice(i, 1);
+          continue;
+        }
+
+        cCtx.save();
+        cCtx.fillStyle = p.color;
+        cCtx.globalAlpha = p.life;
+        cCtx.fillRect(p.x, p.y, p.size, p.size);
+        cCtx.restore();
+      }
+      requestAnimationFrame(renderConfetti);
+    }
+    renderConfetti();
+
+    /* ========================================================
+       초기 실행
+       ======================================================== */
+    window.addEventListener('DOMContentLoaded', () => {
+      resizeCanvas();
+      updateSliderUI();
+      render();
+      checkMissions();
+    });
+  </script>
+</body>
+</html>
