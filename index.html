@@ -10,7 +10,10 @@
       --primary: #465c80;
       --primary-light: #e1e8f3;
       --primary-dark: #30415f;
-      --tutor-surface: #bdcce1;
+      --tutor-surface: #dceafb;
+      --highlight: #fff4c7;
+      --highlight-strong: #fbe7a1;
+      --highlight-border: #e7d48d;
       --surface-soft: #f4f6fa;
       --surface-tint: #e9eef5;
       --bg-panel: #f1f4f9;
@@ -19,21 +22,21 @@
       --border-strong: #8392aa;
       --text-main: #202a3c;
       --text-muted: #47566e;
-      --shape-a: #d6a85f;
-      --shape-a-light: #f3e4c5;
-      --shape-a-ink: #805719;
-      --shape-b: #d28a71;
-      --shape-b-light: #f4dfd6;
-      --shape-b-ink: #8e4936;
-      --shape-c: #bda082;
-      --shape-c-light: #eee5d9;
-      --shape-c-ink: #70533d;
-      --shape-neutral: #e7dfd5;
-      --shape-outline: #6a5b50;
-      --piece-1: #a06e36;
-      --piece-2: #ad6048;
-      --piece-3: #745a83;
-      --piece-4: #756247;
+      --shape-a: #f2cd54;
+      --shape-a-light: #fff3bd;
+      --shape-a-ink: #755500;
+      --shape-b: #ea858a;
+      --shape-b-light: #fce0e2;
+      --shape-b-ink: #842a39;
+      --shape-c: #b49adb;
+      --shape-c-light: #efe4fa;
+      --shape-c-ink: #5a3a82;
+      --shape-neutral: #e9eef5;
+      --shape-outline: #4b5870;
+      --piece-1: #40865c;
+      --piece-2: #4275a8;
+      --piece-3: #b45b25;
+      --piece-4: #9c507a;
       --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
       --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.06);
       --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.05);
@@ -498,9 +501,8 @@
     }
 
     .mission-item.completed {
-      background: var(--primary-light);
-      color: var(--primary-dark);
-      border: 1px solid var(--border);
+      background: var(--highlight);
+      border: 1px solid var(--highlight-border);
     }
 
     .mission-badge {
@@ -518,8 +520,7 @@
     }
 
     .mission-item.completed .mission-badge {
-      background: var(--primary);
-      color: #fff;
+      background: var(--highlight-strong);
     }
 
     /* ========================================================
@@ -667,26 +668,6 @@
       touch-action: none;
     }
 
-    /* 캔버스 하단 상태 힌트 */
-    .canvas-footer-hint {
-      flex-shrink: 0;
-      align-self: center;
-      margin: 0 12px 12px;
-      width: max-content;
-      max-width: calc(100% - 24px);
-      text-align: center;
-      background: rgba(15, 23, 42, 0.8);
-      backdrop-filter: blur(6px);
-      color: #ffffff;
-      padding: 6px 16px;
-      border-radius: 20px;
-      font-size: 14px;
-      font-weight: 600;
-      pointer-events: none;
-      z-index: 10;
-      transition: opacity 0.3s;
-    }
-
     /* ========================================================
        우측 패널: 데이터 & 수식 도출 (Symbolic)
        ======================================================== */
@@ -773,8 +754,8 @@
       border-bottom: none;
     }
 
-    .data-table tr.highlight-row {
-      background: var(--surface-soft);
+    .data-table .highlight-row td {
+      background: var(--highlight);
       animation: highlightFade 1.5s ease-out;
     }
 
@@ -788,16 +769,9 @@
       font-weight: 800;
     }
 
-    .data-table .val-match {
-      background: var(--primary-light);
-      color: var(--primary-dark);
-      border-radius: 4px;
-      padding: 1px 3px;
-    }
-
     @keyframes highlightFade {
-      0% { background: var(--primary-light); }
-      100% { background: var(--surface-soft); }
+      0% { background: var(--highlight-strong); }
+      100% { background: var(--highlight); }
     }
 
     .record-count-badge {
@@ -1180,6 +1154,7 @@
         </div>
         <div class="tutor-speech-bubble" id="euclidPrompt" hidden>
           <strong id="euclidStepTitle"></strong>
+          <p>움직임을 다시 보고 싶으면 아래 단계 버튼을 눌러 봐.</p>
           <p id="euclidStepDesc" aria-live="polite"></p>
           <div class="symbol-chip-group" id="euclidChoices" role="group" aria-label="빈칸에 넣을 보기" aria-describedby="euclidStepDesc"></div>
           <p id="euclidFeedback" role="status"></p>
@@ -1272,10 +1247,6 @@
         <canvas id="geometryCanvas"></canvas>
       </div>
 
-      <!-- 캔버스 하단 조작 가이드 -->
-      <div class="canvas-footer-hint" id="canvasHint">
-        물 붓기를 누르고 두 변 사이의 각에 따라 물이 얼마나 차는지 비교해 보세요.
-      </div>
     </section>
 
     <!-- [우측 패널 20%] 데이터 및 상징화 노트 (Symbolic) -->
@@ -1843,17 +1814,17 @@
         drawLabel(`$c = ${c}$`, x, captionY, shapeC.ink, 12);
         if (overflow > 0) {
           const barWidth = Math.min(94, column - 12) * overflow / State.c2;
-          const blueWidth = barWidth * State.a2 / State.c2;
+          const yellowWidth = barWidth * State.a2 / State.c2;
           ctx.save();
           ctx.fillStyle = waterA.fill;
-          ctx.fillRect(x - barWidth / 2, captionY + 13, blueWidth, 5);
+          ctx.fillRect(x - barWidth / 2, captionY + 13, yellowWidth, 5);
           ctx.fillStyle = waterB.fill;
-          ctx.fillRect(x - barWidth / 2 + blueWidth, captionY + 13, barWidth - blueWidth, 5);
+          ctx.fillRect(x - barWidth / 2 + yellowWidth, captionY + 13, barWidth - yellowWidth, 5);
           ctx.restore();
           drawLabel(`넘친 물 ${Number(overflow.toFixed(1))}`, x, captionY + 29, shapeB.ink, 11);
         } else if (State.waterProgress === 1) {
           const status = empty > 0 ? `빈 공간 ${Number(empty.toFixed(1))}` : '빈틈없이 채움';
-          drawLabel(status, x, captionY + 29, empty > 0 ? shapeC.ink : shapeC.ink, 11);
+          drawLabel(status, x, captionY + 29, shapeC.ink, 11);
         }
       });
     }
@@ -1864,13 +1835,13 @@
       drawPolygon(sqB, shapeB.light, waterB.ink, 1.5);
       drawPolygon(sqC, shapeC.light, shapeC.ink, 1.5);
 
-      const [blue, orange] = getHypotWaterRegions(sqC);
+      const [yellow, red] = getHypotWaterRegions(sqC);
       const surface = level > 0 ? getWaterSurface(sqC, level) : Math.max(...sqC.map(point => point.y));
       drawWaterRegion(sqA, remaining, waterA);
       drawWaterRegion(sqB, remaining, waterB);
       if (level > 0) {
-        drawPolygon(clipWaterSurface(blue, surface), waterA.fill);
-        drawPolygon(clipWaterSurface(orange, surface), waterB.fill);
+        drawPolygon(clipWaterSurface(yellow, surface), waterA.fill);
+        drawPolygon(clipWaterSurface(red, surface), waterB.fill);
       }
 
       drawPolygon([A, B, C], '#fff', shapeOutline, 1.5);
@@ -1885,8 +1856,8 @@
       ctx.restore();
 
       if (State.isPouring) {
-        renderWaterStream(sqA, blue, surface, waterA);
-        renderWaterStream(sqB, orange, surface, waterB);
+        renderWaterStream(sqA, yellow, surface, waterA);
+        renderWaterStream(sqB, red, surface, waterB);
       }
       [
         [sqA, '$a^{2}$', shapeA.ink], [sqB, '$b^{2}$', shapeB.ink], [sqC, '$c^{2}$', shapeC.ink]
@@ -2247,7 +2218,6 @@
     const recordBadge = document.getElementById('recordBadge');
     const btnSnapToggle = document.getElementById('btnSnapToggle');
     const snapIndicator = document.getElementById('snapIndicator');
-    const canvasHint = document.getElementById('canvasHint');
     const euclidPrompt = document.getElementById('euclidPrompt');
     const modeTabs = [...document.querySelectorAll('.tab-btn')];
     const euclidTools = document.getElementById('euclidTools');
@@ -2270,7 +2240,6 @@
       document.getElementById('formulaBuilder').hidden = mode !== 'data';
       document.getElementById('achievementCard').hidden = mode !== 'data';
       geometryStage.hidden = worksheetOpen;
-      canvasHint.hidden = worksheetOpen;
       btnRecordData.hidden = mode !== 'data';
       btnPourWater.hidden = mode !== 'water';
       puzzleTools.hidden = mode !== 'puzzle';
@@ -2281,16 +2250,13 @@
       tutorSpeech.hidden = mode === 'euclid';
 
       if (mode === 'water') {
-        canvasHint.textContent = '물 붓기를 누르고 두 변 사이의 각에 따라 물이 얼마나 차는지 비교해 보세요.';
-        setTutorSpeech('같은 양의 물을 세 삼각형에 보내면 어떻게 될까? 물을 부어 비교해 보자!');
+        setTutorSpeech('[물 붓기]를 눌러 같은 양의 물을 세 삼각형에 보내 봐. 각도에 따라 물이 얼마나 차는지 비교해 보자!');
       } else if (mode === 'puzzle') {
         showPuzzlePrompt();
         if (State.puzzleSolved) showPuzzleQuestion(puzzleQuestionIndex);
       } else if (mode === 'data') {
-        canvasHint.textContent = '변의 길이를 바꾸고 표에 기록한 뒤 오른쪽에서 관계식을 완성해 보세요.';
-        setTutorSpeech('왼쪽 슬라이더로 여러 직각삼각형을 만들고 표에 기록해 봐. 세 변을 제곱한 수 사이에 어떤 규칙이 있을까?');
+        setTutorSpeech('왼쪽 슬라이더로 여러 직각삼각형을 만들어 표에 기록해 봐. 세 변을 제곱한 수의 규칙을 찾아 오른쪽에서 관계식을 완성해 보자!');
       } else if (mode === 'euclid') {
-        canvasHint.textContent = '단계 버튼을 누르면 그 단계의 움직임을 다시 볼 수 있어요.';
         selectProofStep(State.euclidStep);
       } else if (mode === 'tile') {
         setTutorSpeech('정사각형마다 넓이가 $s$인 삼각형이 몇 개 들어가는지 세어 봐.');
@@ -2413,7 +2379,7 @@
       } else {
         State.isPouring = true;
         Sound.splash();
-        setTutorSpeech('물줄기가 도착하면 갈색 정사각형의 물이 차오를 거야. 어느 각에서 물이 딱 맞을까?');
+        setTutorSpeech('물줄기가 도착하면 보라색 정사각형의 물이 차오를 거야. 어느 각에서 물이 딱 맞을까?');
       }
       updatePourButtonUI();
     });
@@ -2430,7 +2396,7 @@
       saveProgress();
       Sound.fanfare();
       if (State.mode !== 'water') return;
-      setTutorSpeech("황토색 물은 $a^{2}$, 살구색 물은 $b^{2}$에서 왔어. 30°에서는 물이 넘치고, 90°에서는 딱 맞고, 120°에서는 빈 공간이 남아. 보낸 물의 양은 같은데 결과가 왜 다를까?");
+      setTutorSpeech("노란 물은 $a^{2}$, 빨간 물은 $b^{2}$에서 왔어. 30°에서는 물이 넘치고, 90°에서는 딱 맞고, 120°에서는 빈 공간이 남아. 보낸 물의 양은 같은데 결과가 왜 다를까?");
     }
 
     const tileSquares = [
@@ -2614,8 +2580,8 @@
       {
         title: '3단계 · 빗변 정사각형 안으로 옮기기',
         prompts: [
-          ['황토색 삼각형은 황토색 직사각형과 밑변과 높이가 같아. 살구색도 같은 방법으로 비교해 봐. 삼각형 하나의 넓이는 같은 색 직사각형 넓이의 ', '이야.'],
-          ['황토색 직사각형의 넓이는 밑변 위 정사각형과 같고, 살구색 직사각형의 넓이는 높이 위 정사각형과 같아. 두 직사각형을 합치면 빗변 위 정사각형이 돼. 이 관계를 식으로 쓰면 ', '이야.']
+          ['노란 삼각형은 노란 직사각형과 밑변과 높이가 같아. 빨간색도 같은 방법으로 비교해 봐. 삼각형 하나의 넓이는 같은 색 직사각형 넓이의 ', '이야.'],
+          ['노란 직사각형의 넓이는 밑변 위 정사각형과 같고, 빨간 직사각형의 넓이는 높이 위 정사각형과 같아. 두 직사각형을 합치면 빗변 위 정사각형이 돼. 이 관계를 식으로 쓰면 ', '이야.']
         ],
         hints: ['밑변과 높이가 같을 때 직사각형과 삼각형의 넓이 공식을 비교해 봐.', '빗변 위 정사각형 전체의 넓이가 등호 오른쪽에 와야 해.'],
         summary: '같은 색 삼각형의 넓이를 두 배 하면 작은 정사각형의 넓이이자 빗변 쪽 직사각형의 넓이야. 그래서 $a^{2} + b^{2} = c^{2}$가 성립해.',
@@ -2696,7 +2662,7 @@
         hint: '조각을 옮기는 동안 조각을 자르거나 크기를 바꿨는지 살펴보세요.'
       },
       {
-        prompt: '두 판의 전체 넓이도, 조각이 덮는 넓이도 같아요. 남은 황토색 정사각형과 살구색 정사각형의 넓이 합은 갈색 정사각형의 넓이와 어떻게 비교될까요?',
+        prompt: '두 판의 전체 넓이도, 조각이 덮는 넓이도 같아요. 남은 노란 정사각형과 빨간 정사각형의 넓이 합은 보라색 정사각형의 넓이와 어떻게 비교될까요?',
         choices: ['더 작아요', '같아요', '더 커요'],
         answer: 1,
         hint: '크기가 같은 두 판에서 같은 넓이를 빼면 각각 얼마나 남을까요?'
@@ -2708,8 +2674,7 @@
     function showPuzzlePrompt() {
       puzzleDiscovery.hidden = true;
       tutorSpeech.hidden = false;
-      canvasHint.textContent = '삼각형 조각을 같은 색 점선으로 옮겨 보세요. [자동맞춤]은 조각 옮기기를 도와줘요.';
-      setTutorSpeech("크기가 같은 두 판이 있어. 첫 번째 판의 삼각형 네 조각을 두 번째 판으로 옮겨 봐. 조각이 덮지 않은 색칠 영역이 어떻게 달라지는지 살펴보자!");
+      setTutorSpeech('삼각형 네 조각을 두 번째 판의 같은 색 점선으로 옮겨 봐. 옮기기 어려우면 [조각 자동맞춤]을 눌러 봐. 조각을 옮긴 뒤에 남은 색칠 영역도 살펴보자!');
     }
 
     function showPuzzleQuestion(index) {
@@ -2719,11 +2684,9 @@
       puzzleDiscovery.hidden = false;
       puzzleFeedback.textContent = '';
       puzzleChoices.replaceChildren();
-      canvasHint.textContent = '색칠 영역을 살펴보고 위에 있는 피타 쌤의 질문에 답해 보세요.';
       if (!question) {
-        puzzleQuestion.textContent = '발견! 황토색 정사각형과 살구색 정사각형의 넓이 합은 갈색 정사각형의 넓이와 같아요.';
+        puzzleQuestion.textContent = '발견! 노란 정사각형과 빨간 정사각형의 넓이 합은 보라색 정사각형의 넓이와 같아요.';
         puzzleFeedback.textContent = '타일 분석하기로 이동해 이 넓이 관계를 식으로 나타내 봐요.';
-        canvasHint.textContent = '황토색 영역의 넓이와 살구색 영역의 넓이를 더하면 갈색 영역의 넓이와 같아요.';
         return;
       }
       puzzleQuestion.textContent = question.prompt;
@@ -2898,7 +2861,7 @@
         <td>${recordItem.a2}</td>
         <td>${recordItem.b2}</td>
         <td class="val-sum">${recordItem.sum}</td>
-        <td class="val-c2"><span class="val-match">${recordItem.c2}</span></td>
+        <td class="val-c2">${recordItem.c2}</td>
       `;
       dataTableBody.appendChild(tr);
 
