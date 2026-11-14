@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>피타고라스 정리 탐구 연구소 - 2022 개정 중2 수학 (브루너 EIS 모델)</title>
   <style>
@@ -706,6 +707,19 @@
       color: var(--text-main);
     }
 
+    .progress-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 4px 8px;
+    }
+
+    #progressStatus {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
     /* 탐구 데이터 표 */
     .table-container {
       background: #ffffff;
@@ -1254,6 +1268,11 @@
 
     <!-- [우측 패널 20%] 데이터 및 상징화 노트 (Symbolic) -->
     <aside class="panel-right">
+      <div class="progress-controls">
+        <p id="progressStatus" role="status">학습 기록은 이 브라우저에만 저장돼요.</p>
+        <button class="btn-subtle" id="btnClearProgress" type="button" hidden>학습 기록 지우기</button>
+      </div>
+
       <!-- 탐구 데이터 표 -->
       <div class="section-title">
         <span>📊 탐구 데이터 표</span>
@@ -2067,6 +2086,7 @@
           State.puzzleSolved = true;
           canvasHint.textContent = '회색은 조각이 있던 자리예요. 색칠 영역을 살펴보고 피타 쌤 아래의 질문에 답해 보세요.';
           showPuzzleQuestion(0);
+          saveProgress();
         }
       }
     }
@@ -2345,8 +2365,10 @@
       ['FI', 'EI', 'EF'].forEach(term => field.add(new Option(plainMath(term + '^{2}'), term)));
     });
 
+    const tileAnswerPattern = /^\s*(?:정사각형\s*)?([A-I](?:[\s,·]*[A-I]){3})\s*[,·:=，]?\s*(\d+)\s*[×*]?\s*S\s*$/i;
+
     function matchesTileSquare(value, { vertices, area }) {
-      const match = value.toUpperCase().match(/^\s*(?:정사각형\s*)?([A-I](?:[\s,·]*[A-I]){3})\s*[,·:=，]?\s*(\d+)\s*[×*]?\s*S\s*$/);
+      const match = value.toUpperCase().match(tileAnswerPattern);
       if (!match || match[2] + 's' !== area) return false;
       const order = match[1].replace(/[^A-I]/g, '');
       const reverse = [...order].reverse().join('');
@@ -2978,7 +3000,43 @@
        초기 실행
        ======================================================== */
     const progressKey = 'bruner-learning-progress-v1';
+    const progressStatus = document.getElementById('progressStatus');
+    const btnClearProgress = document.getElementById('btnClearProgress');
     let restoringProgress = false;
+    let clearingProgress = false;
+
+    function setProgressStatus(message) {
+      if (progressStatus.textContent !== message) progressStatus.textContent = message;
+    }
+
+    function getTileProgress(field, value) {
+      if (typeof value !== 'string') return '';
+      if (field.tagName === 'SELECT') {
+        return [...field.options].some(option => option.value === value) ? value : '';
+      }
+      return value.length <= field.maxLength && tileAnswerPattern.test(value) ? value.trim() : '';
+    }
+
+    function reloadWithoutProgress() {
+      clearingProgress = true;
+      window.location.reload();
+    }
+
+    btnClearProgress.addEventListener('click', () => {
+      if (!window.confirm('이 브라우저의 학습 기록을 모두 지우고 처음부터 시작할까요?')) return;
+      try {
+        localStorage.removeItem(progressKey);
+      } catch {
+        setProgressStatus('학습 기록을 지울 수 없어요. 브라우저의 사이트 데이터 설정을 확인해 주세요.');
+        return;
+      }
+      reloadWithoutProgress();
+    });
+
+    window.addEventListener('storage', event => {
+      if (event.storageArea === localStorage && (event.key === progressKey || event.key === null) &&
+          event.newValue === null) reloadWithoutProgress();
+    });
 
     function getPuzzleProgress() {
       const { source, side } = getPuzzleLayout();
@@ -2994,7 +3052,7 @@
       State.draggedPiece = null;
       State.selectedPiece = null;
       State.puzzlePieces.forEach(piece => {
-        const previous = saved.find(entry => entry.slot === piece.slot);
+        const previous = saved.find(entry => entry?.slot === piece.slot);
         if (!previous || !Number.isFinite(previous.x) || !Number.isFinite(previous.y)) return;
         piece.placed = previous.placed === true;
         piece.current = piece.placed ? getPuzzleTarget(piece, layout).center : {
@@ -3005,7 +3063,7 @@
     }
 
     function saveProgress() {
-      if (restoringProgress) return;
+      if (restoringProgress || clearingProgress) return;
       try {
         localStorage.setItem(progressKey, JSON.stringify({
           mode: State.mode, a: State.a, b: State.b, snapTriples: State.snapTriples,
@@ -3013,24 +3071,35 @@
           waterCompared: State.waterCompared, waterDirection: State.waterDirection, isPouring: State.isPouring,
           records: State.records, formula: slots.map(slot => slot.dataset.val),
           formulaSolved: State.formulaSolved, formulaError: State.isFormulaError,
-          tile: tileFields.map(field => field.tagName === 'SELECT' ? field.value :
-            field.value.trimStart().replace(/^정사각형\s*/, '').match(/^[-A-Ia-isS0-9\s,，·:=×*]{1,36}$/)?.[0] || ''),
+          tile: tileFields.map(field => getTileProgress(field, field.value)),
           tileChecked: tileEquation.hasAttribute('aria-invalid'),
           extensionIndex, proofAnswers, proofStep: State.euclidStep,
           pieces: getPuzzleProgress(), puzzleQuestionIndex,
           puzzleSolved: State.puzzleSolved, puzzleDiscovered: State.puzzleDiscovered,
           puzzleMissionDone: State.puzzleMissionDone
         }));
+        btnClearProgress.hidden = false;
+        setProgressStatus('학습 기록은 이 브라우저에만 저장돼요.');
       } catch {
-        // Storage may be unavailable in some browsers.
+        setProgressStatus('학습 기록을 저장할 수 없어요.');
       }
     }
 
     function restoreProgress() {
+      let storedProgress;
+      try {
+        storedProgress = localStorage.getItem(progressKey);
+      } catch {
+        setProgressStatus('학습 기록을 저장할 수 없어요.');
+        return;
+      }
+      if (storedProgress === null) return;
+      btnClearProgress.hidden = false;
       let saved;
       try {
-        saved = JSON.parse(localStorage.getItem(progressKey));
+        saved = JSON.parse(storedProgress);
       } catch {
+        setProgressStatus('저장된 학습 기록을 읽을 수 없어요.');
         return;
       }
       if (!saved || ![saved.a, saved.b].every(v => Number.isInteger(v) && v >= 1 && v <= 15)) return;
@@ -3074,7 +3143,7 @@
           State.isFormulaError = saved.formulaError === true;
           updateFormulaStatus();
         }
-        tileFields.forEach((field, index) => { field.value = saved.tile?.[index] || ''; });
+        tileFields.forEach((field, index) => { field.value = getTileProgress(field, saved.tile?.[index]); });
         if (saved.tileChecked) checkTileAnswers();
         if (Number.isInteger(saved.extensionIndex) && saved.extensionIndex >= 0 && saved.extensionIndex <= extensionSteps.length) {
           State.extensionSolved = saved.extensionIndex === extensionSteps.length;
@@ -3121,7 +3190,9 @@
       document.addEventListener('click', saveProgress);
       document.addEventListener('input', saveProgress);
       document.addEventListener('change', saveProgress);
-      window.addEventListener('pagehide', saveProgress);
+      window.addEventListener('pagehide', () => {
+        if (!btnClearProgress.hidden) saveProgress();
+      });
     });
   </script>
 </body>
