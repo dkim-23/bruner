@@ -517,7 +517,7 @@
       align-items: center;
     }
 
-    .activity-navigation, #puzzleTools, #euclidTools {
+    #puzzleTools, #euclidTools {
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
@@ -942,6 +942,14 @@
     .worksheet figure { text-align: center; }
     .worksheet svg { width: 100%; max-width: 280px; height: auto; display: block; margin: auto; }
     .worksheet figcaption { font-size: 13px; }
+    #extensionActivity {
+      grid-template-columns: minmax(0, 1fr);
+      align-content: start;
+      justify-items: center;
+      gap: 8px;
+    }
+    .extension-problem { width: min(100%, 520px); }
+    #extensionQuestion { margin-top: 6px; }
     .worksheet ol { display: grid; gap: 8px; padding-left: 1.4em; margin: 8px 0; }
     .worksheet input, .worksheet select {
       display: block;
@@ -1030,11 +1038,15 @@
         </div>
         <div class="mission-item" id="mission4">
           <div class="mission-badge" id="mBadge4">4</div>
-          <span>변을 조작해 표에 기록하고 관계식 완성하기</span>
+          <span>직각삼각형으로 넓이 관계 확장하기</span>
         </div>
         <div class="mission-item" id="mission5">
           <div class="mission-badge" id="mBadge5">5</div>
-          <span>직각삼각형으로 확장하고 증명하기</span>
+          <span>변을 조작해 표에 기록하고 관계식 완성하기</span>
+        </div>
+        <div class="mission-item" id="mission6">
+          <div class="mission-badge" id="mBadge6">6</div>
+          <span>정사각형의 넓이 관계 증명하기</span>
         </div>
       </div>
 
@@ -1051,11 +1063,14 @@
           <button class="tab-btn" data-mode="tile" id="tabTile">
             <span>③ 타일 분석하기</span>
           </button>
-          <button class="tab-btn" data-mode="data" id="tabData">
-            <span>④ 변 조작과 데이터 기록</span>
+          <button class="tab-btn" data-mode="extend" id="tabExtend">
+            <span>④ 직각삼각형으로 확장하기</span>
           </button>
-          <button class="tab-btn" data-mode="extend" data-alternate-mode="euclid" id="tabExtend">
-            <span>⑤ 직각삼각형으로 확장하고 증명하기</span>
+          <button class="tab-btn" data-mode="data" id="tabData">
+            <span>⑤ 변 조작과 데이터 기록</span>
+          </button>
+          <button class="tab-btn" data-mode="euclid" id="tabEuclid">
+            <span>⑥ 증명하기</span>
           </button>
         </div>
       </div>
@@ -1064,7 +1079,7 @@
       <div class="control-card" id="triangleControls" hidden>
         <div class="control-card-header">
           <div class="control-card-title">
-            <span>직각삼각형 변 조작</span>
+            <span>삼각형 변 조작</span>
           </div>
           <div class="snap-toggle" id="btnSnapToggle" title="빗변 c가 자연수가 되도록 자동 스냅합니다">
             <span id="snapIndicator">자연수 c ON</span>
@@ -1091,7 +1106,7 @@
 
         <!-- 빗변 c 안내 -->
         <div class="slider-label-row" style="margin-top: 6px; padding: 4px 6px; background:#f1f5f9; border-radius:6px;">
-          <span><span class="color-indicator" style="background:#7c3aed;"></span>빗변 c</span>
+          <span><span class="color-indicator" style="background:#7c3aed;"></span><span id="sideCLabel">직각일 때 빗변 c</span></span>
           <span style="font-size:12px; font-weight:700; color:#7c3aed;" id="valBoxC">$c = 5.0 (c^{2} = 25)$</span>
         </div>
 
@@ -1149,10 +1164,6 @@
           <button class="btn-action" id="btnPuzzleReset">조각 원위치</button>
         </div>
         <button class="btn-action accent" id="btnRecordData" hidden>표에 기록하기</button>
-        <div class="activity-navigation" id="extensionTools" role="group" aria-label="확장과 증명" hidden>
-          <button class="btn-action" id="btnExtensionMode" type="button" aria-pressed="true">직각삼각형으로 확장</button>
-          <button class="btn-action" id="btnProofMode" type="button" aria-pressed="false">증명해보기</button>
-        </div>
         <div id="euclidTools" role="group" aria-label="증명 단계" hidden>
           <button class="btn-action" data-proof-step="0" aria-pressed="true">1단계</button>
           <button class="btn-action" data-proof-step="1" aria-pressed="false">2단계</button>
@@ -1213,15 +1224,15 @@
               <foreignObject x="107" y="62" width="24" height="26"><div data-diagram-math>$c$</div></foreignObject>
             </g>
           </svg>
-          <figcaption>두 직각변의 길이 $a, b$를 고정해요.</figcaption>
         </figure>
-        <div>
-          <h2 id="extensionTitle">직각삼각형으로 확장</h2>
+        <div class="extension-problem">
+          <h2 id="extensionTitle">직각삼각형으로 확장하기</h2>
+          <p>그림에서 두 직각변의 길이 $a, b$를 고정하고 다음 질문에 답해 보세요.</p>
           <p id="extensionQuestion"></p>
           <div class="symbol-chip-group" id="extensionChoices"></div>
           <p id="extensionFeedback" role="status"></p>
           <div class="activity-actions">
-            <button class="btn-action primary" id="btnGoToProof" hidden>증명하기 →</button>
+            <button class="btn-action primary" id="btnGoToData" type="button" hidden>변 조작과 데이터 기록으로 →</button>
             <button class="btn-action" id="btnResetExtension" type="button">다시 활동하기</button>
           </div>
         </div>
@@ -1334,7 +1345,7 @@
       get b2() { return this.b * this.b; },
       get c2() { return this.a2 + this.b2; },
 
-      // 모드: 'water' | 'puzzle' | 'tile' | 'data' | 'extend' | 'euclid'
+      // 모드: 'water' | 'puzzle' | 'tile' | 'extend' | 'data' | 'euclid'
       mode: 'water',
       
       // 스냅 기능 (무리수 방지 피타고라스 삼쌍 우선)
@@ -2185,6 +2196,7 @@
     const valBoxA = document.getElementById('valBoxA');
     const valBoxB = document.getElementById('valBoxB');
     const valBoxC = document.getElementById('valBoxC');
+    const sideCLabel = document.getElementById('sideCLabel');
     const tutorSpeech = document.getElementById('tutorSpeech');
     const btnPourWater = document.getElementById('btnPourWater');
     const btnRecordData = document.getElementById('btnRecordData');
@@ -2195,16 +2207,12 @@
     const canvasHint = document.getElementById('canvasHint');
     const euclidPrompt = document.getElementById('euclidPrompt');
     const modeTabs = [...document.querySelectorAll('.tab-btn')];
-    const extensionTab = document.getElementById('tabExtend');
-    const btnExtensionMode = document.getElementById('btnExtensionMode');
-    const btnProofMode = document.getElementById('btnProofMode');
-    const extensionTools = document.getElementById('extensionTools');
     const euclidTools = document.getElementById('euclidTools');
     const puzzleTools = document.getElementById('puzzleTools');
     const canvasToolbar = document.querySelector('.canvas-toolbar');
 
     function setMode(mode) {
-      const activeTab = modeTabs.find(button => button.dataset.mode === mode || button.dataset.alternateMode === mode);
+      const activeTab = modeTabs.find(button => button.dataset.mode === mode);
       if (!activeTab) return;
       modeTabs.forEach(button => {
         button.classList.toggle('active', button === activeTab);
@@ -2214,7 +2222,8 @@
       const worksheetOpen = mode === 'tile' || mode === 'extend';
       document.getElementById('tileActivity').hidden = mode !== 'tile';
       document.getElementById('extensionActivity').hidden = mode !== 'extend';
-      document.getElementById('triangleControls').hidden = mode !== 'data';
+      document.getElementById('triangleControls').hidden = worksheetOpen;
+      sideCLabel.textContent = mode === 'water' ? '직각일 때 빗변 c' : '빗변 c';
       document.getElementById('formulaBuilder').hidden = mode !== 'data';
       document.getElementById('achievementCard').hidden = mode !== 'data';
       geometryStage.hidden = worksheetOpen;
@@ -2222,10 +2231,7 @@
       btnRecordData.hidden = mode !== 'data';
       btnPourWater.hidden = mode !== 'water';
       puzzleTools.hidden = mode !== 'puzzle';
-      canvasToolbar.hidden = mode === 'tile';
-      extensionTools.hidden = activeTab !== extensionTab;
-      btnExtensionMode.setAttribute('aria-pressed', mode === 'extend');
-      btnProofMode.setAttribute('aria-pressed', mode === 'euclid');
+      canvasToolbar.hidden = worksheetOpen;
       euclidTools.hidden = mode !== 'euclid';
       euclidPrompt.hidden = mode !== 'euclid';
       puzzleDiscovery.hidden = true;
@@ -2256,8 +2262,6 @@
       Sound.click();
       setMode(button.dataset.mode);
     }));
-    btnExtensionMode.addEventListener('click', () => setMode('extend'));
-    btnProofMode.addEventListener('click', () => setMode('euclid'));
 
     // 슬라이더 변경 핸들러 (오직 슬라이더 조정만 수행, 자동 표 기록 완전 제거)
     function onSliderChange() {
@@ -2287,15 +2291,24 @@
         }
       }
 
-      State.a = newA;
-      State.b = newB;
-      updateSliderUI();
-      checkMissions();
+      changeTriangleSides(newA, newB);
       Sound.click();
     }
 
     sliderA.addEventListener('input', onSliderChange);
     sliderB.addEventListener('input', onSliderChange);
+
+    function changeTriangleSides(a, b) {
+      if (State.a === a && State.b === b) return;
+      State.a = a;
+      State.b = b;
+      updateSliderUI();
+      if (State.mode === 'water') {
+        setTutorSpeech('세 삼각형에 같은 두 변의 길이를 적용했어. 다시 물을 부어 어느 각에서 딱 맞는지 비교해 봐!');
+      } else if (State.mode === 'euclid') {
+        State.euclidStartedAt = performance.now();
+      }
+    }
 
     function updateSliderUI(resetActivities = true) {
       setMathText(valBoxA, `$a = ${State.a} (a^{2} = ${State.a2})$`);
@@ -2326,12 +2339,11 @@
         const b = parseInt(btn.dataset.b, 10);
         sliderA.value = a;
         sliderB.value = b;
-        State.a = a;
-        State.b = b;
-        updateSliderUI();
+        changeTriangleSides(a, b);
         Sound.snap();
-        checkMissions();
-        setTutorSpeech(`a=${a}, b=${b}, c=${Math.round(Math.hypot(a, b))} 직각삼각형이 되었어! 각 변에 연결된 정사각형들의 넓이를 눈여겨보자.`);
+        if (State.mode === 'data') {
+          setTutorSpeech(`$a=${a}, b=${b}, c=${Math.hypot(a, b)}$인 직각삼각형이야. 표에 기록해 다른 삼각형과 비교해 봐!`);
+        }
       });
     });
 
@@ -2463,7 +2475,7 @@
     const extensionQuestion = document.getElementById('extensionQuestion');
     const extensionChoices = document.getElementById('extensionChoices');
     const extensionFeedback = document.getElementById('extensionFeedback');
-    const btnGoToProof = document.getElementById('btnGoToProof');
+    const btnGoToData = document.getElementById('btnGoToData');
 
     let extensionIndex = 0;
 
@@ -2472,10 +2484,10 @@
       const step = extensionSteps[index];
       extensionFeedback.textContent = '';
       extensionChoices.replaceChildren();
-      btnGoToProof.hidden = Boolean(step);
+      btnGoToData.hidden = Boolean(step);
       if (!step) {
         setMathText(extensionQuestion, '예상한 식은 $a^{2} + b^{2} = c^{2}$예요.');
-        extensionFeedback.textContent = 'SAS 합동으로 빗변의 길이가 하나로 정해져요. 이제 증명 활동에서 예상한 넓이 관계가 성립하는 이유를 확인해 보세요.';
+        extensionFeedback.textContent = 'SAS 합동으로 빗변의 길이가 하나로 정해져요. 이제 변의 길이를 바꿔 가며 예상한 넓이 관계를 표에서 확인해 보세요.';
         return;
       }
       setMathText(extensionQuestion, `${index + 1}/${extensionSteps.length} · ${step.question}`);
@@ -2494,7 +2506,7 @@
             return;
           }
           showExtensionStep(extensionSteps.length);
-          btnGoToProof.focus();
+          btnGoToData.focus();
           State.extensionSolved = true;
           checkMissions();
         });
@@ -2508,9 +2520,10 @@
       showExtensionStep(0);
       checkMissions();
     });
-    btnGoToProof.addEventListener('click', () => {
-      setMode('euclid');
-      btnProofMode.focus();
+    btnGoToData.addEventListener('click', () => {
+      const tab = document.getElementById('tabData');
+      tab.click();
+      tab.focus();
     });
 
     const btnFullscreen = document.getElementById('btnFullscreen');
@@ -2953,7 +2966,7 @@
     function checkMissions() {
       const proofComplete = proofSteps.every((step, index) => proofAnswers[index].length === step.answers.length);
       const completed = [State.waterCompared, State.puzzleMissionDone, State.tileSolved,
-        State.formulaSolved, State.extensionSolved && proofComplete];
+        State.extensionSolved, State.formulaSolved, proofComplete];
       completed.forEach((done, index) => {
         const number = index + 1;
         document.getElementById(`mission${number}`).classList.toggle('completed', done);
