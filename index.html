@@ -66,11 +66,6 @@
       gap: 12px;
     }
 
-    .app-logo {
-      font-size: 22px;
-      line-height: 1;
-    }
-
     .app-title {
       font-size: 17px;
       font-weight: 700;
@@ -549,6 +544,11 @@
       transform: translateY(-1px);
     }
 
+    .btn-action:disabled {
+      cursor: wait;
+      transform: none;
+    }
+
     .btn-action.primary {
       background: var(--primary);
       color: #ffffff;
@@ -583,19 +583,6 @@
       color: #fff;
     }
 
-    .euclid-banner {
-      flex: 0 0 auto;
-      margin: 8px 12px 0;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      background: #fff;
-      border: 1px solid #a855f7;
-      border-radius: 12px;
-      padding: 8px 12px;
-      font-size: 13px;
-    }
-
     .proof-blank {
       display: inline-block;
       min-width: 3em;
@@ -608,8 +595,9 @@
 
     #euclidFeedback {
       color: #5b21b6;
-      min-height: 1.3em;
     }
+
+    #euclidStepDesc { margin-top: 4px; }
 
     /* 오답 안내 박스 */
     .formula-error-box {
@@ -911,11 +899,6 @@
       100% { transform: scale(1); opacity: 1; }
     }
 
-    .achievement-icon {
-      font-size: 32px;
-      margin-bottom: 4px;
-    }
-
     .achievement-title {
       font-size: 14px;
       font-weight: 800;
@@ -981,7 +964,7 @@
     .worksheet .symbol-chip-group { justify-content: flex-start; margin-top: 6px; }
     .worksheet .btn-action { margin-top: 6px; }
     #puzzleDiscovery .symbol-chip-group { margin: 5px 0; }
-    #btnFullscreen { width: auto; padding: 0 9px; font-size: 13px; white-space: nowrap; }
+    .header-right .btn-icon { width: auto; padding: 0 9px; font-size: 13px; white-space: nowrap; }
     #fullscreenNotice { position: fixed; right: 12px; top: 58px; z-index: 30; background: white; font-size: 13px; }
 
     @media (max-height: 700px) {
@@ -1011,7 +994,6 @@
   <!-- 헤더 -->
   <header>
     <div class="header-left">
-      <div class="app-logo">📐</div>
       <div class="app-title">
         피타고라스 정리 학습 활동
         <span class="badge-curriculum">2022 개정 중2 수학</span>
@@ -1020,7 +1002,7 @@
 
     <div class="header-right">
       <button class="btn-icon" id="btnFullscreen" aria-pressed="false">전체화면</button>
-      <button class="btn-icon" id="btnSoundToggle" title="소리 켜기/끄기">🔊</button>
+      <button class="btn-icon" id="btnSoundToggle" type="button" aria-pressed="true">소리 켜짐</button>
     </div>
   </header>
   <p id="fullscreenNotice" role="status"></p>
@@ -1032,7 +1014,7 @@
       <!-- 미니 미션 (적용 학습) -->
       <div class="mission-card">
         <div class="mission-title">
-          <span>🎯 오늘의 탐구 미션</span>
+          <span>오늘의 탐구 미션</span>
         </div>
         <div class="mission-item" id="mission1">
           <div class="mission-badge" id="mBadge1">1</div>
@@ -1061,10 +1043,10 @@
         <div class="mode-tab-title">탐구 활동 모드</div>
         <div class="mode-tabs">
           <button class="tab-btn active" data-mode="water" id="tabWater">
-            <span>💧 ① 물 채우기</span>
+            <span>① 물 채우기</span>
           </button>
           <button class="tab-btn" data-mode="puzzle" id="tabPuzzle">
-            <span>🧩 ② 퍼즐맞추기</span>
+            <span>② 퍼즐맞추기</span>
           </button>
           <button class="tab-btn" data-mode="tile" id="tabTile">
             <span>③ 타일 분석하기</span>
@@ -1073,7 +1055,7 @@
             <span>④ 변 조작과 데이터 기록</span>
           </button>
           <button class="tab-btn" data-mode="extend" data-alternate-mode="euclid" id="tabExtend">
-            <span>📐 ⑤ 직각삼각형으로 확장하고 증명하기</span>
+            <span>⑤ 직각삼각형으로 확장하고 증명하기</span>
           </button>
         </div>
       </div>
@@ -1082,10 +1064,10 @@
       <div class="control-card" id="triangleControls" hidden>
         <div class="control-card-header">
           <div class="control-card-title">
-            <span>📏 직각삼각형 변 조작</span>
+            <span>직각삼각형 변 조작</span>
           </div>
           <div class="snap-toggle" id="btnSnapToggle" title="빗변 c가 자연수가 되도록 자동 스냅합니다">
-            <span id="snapIndicator">🧲 자연수 c ON</span>
+            <span id="snapIndicator">자연수 c ON</span>
           </div>
         </div>
 
@@ -1153,16 +1135,20 @@
           <div class="symbol-chip-group" id="puzzleChoices"></div>
           <p id="puzzleFeedback" role="status"></p>
         </div>
+        <div class="tutor-speech-bubble" id="euclidPrompt" hidden>
+          <strong id="euclidStepTitle"></strong>
+          <p id="euclidStepDesc" aria-live="polite"></p>
+          <div class="symbol-chip-group" id="euclidChoices" role="group" aria-label="빈칸에 넣을 보기" aria-describedby="euclidStepDesc"></div>
+          <p id="euclidFeedback" role="status"></p>
+        </div>
       </div>
       <div class="canvas-toolbar">
-        <button class="btn-action primary" id="btnPourWater">
-          <span id="pourWaterIcon">💧</span> <span id="pourWaterText">물 붓기 시뮬레이션</span>
-        </button>
+        <button class="btn-action primary" id="btnPourWater">물 붓기</button>
         <div id="puzzleTools" hidden>
-          <button class="btn-action" id="btnPuzzleHint">🧩 조각 자동맞춤</button>
-          <button class="btn-action" id="btnPuzzleReset">🔄 조각 원위치</button>
+          <button class="btn-action" id="btnPuzzleHint">조각 자동맞춤</button>
+          <button class="btn-action" id="btnPuzzleReset">조각 원위치</button>
         </div>
-        <button class="btn-action accent" id="btnRecordData" hidden>📝 표에 기록하기</button>
+        <button class="btn-action accent" id="btnRecordData" hidden>표에 기록하기</button>
         <div class="activity-navigation" id="extensionTools" role="group" aria-label="확장과 증명" hidden>
           <button class="btn-action" id="btnExtensionMode" type="button" aria-pressed="true">직각삼각형으로 확장</button>
           <button class="btn-action" id="btnProofMode" type="button" aria-pressed="false">증명해보기</button>
@@ -1171,17 +1157,9 @@
           <button class="btn-action" data-proof-step="0" aria-pressed="true">1단계</button>
           <button class="btn-action" data-proof-step="1" aria-pressed="false">2단계</button>
           <button class="btn-action" data-proof-step="2" aria-pressed="false">3단계</button>
+          <button class="btn-action" id="btnResetProof" type="button">다시 활동하기</button>
         </div>
       </div>
-
-      <div class="euclid-banner" id="euclidBanner" hidden>
-        <strong id="euclidStepTitle"></strong>
-        <div id="euclidStepDesc"></div>
-        <div class="symbol-chip-group" id="euclidChoices" role="group" aria-label="빈칸에 넣을 보기"></div>
-        <div id="euclidFeedback" role="status"></div>
-        <button class="btn-action" id="btnResetProof" type="button">다시 활동하기</button>
-      </div>
-
 
       <section class="worksheet" id="tileActivity" aria-labelledby="tileTitle" hidden>
         <figure>
@@ -1269,7 +1247,7 @@
 
       <!-- 탐구 데이터 표 -->
       <div class="section-title">
-        <span>📊 탐구 데이터 표</span>
+        <span>탐구 데이터 표</span>
         <span class="record-count-badge" id="recordBadge">기록 0회</span>
       </div>
 
@@ -1296,7 +1274,7 @@
       <!-- 수식 도출 & 상징화 완성하기 -->
       <div class="formula-builder-card" id="formulaBuilder" hidden>
         <div class="builder-question">
-          ✏️ 데이터 표의 숫자를 보고<br><strong>세 정사각형 넓이의 관계식</strong>을 완성해봐!
+          데이터 표의 숫자를 보고<br><strong>세 정사각형 넓이의 관계식</strong>을 완성해봐!
         </div>
 
         <div class="formula-equation-box" id="formulaEquationBox">
@@ -1309,7 +1287,6 @@
 
         <!-- 오답 안내 박스 (오답 시 공식 칸을 가리고 표시) -->
         <div class="formula-error-box" id="formulaErrorBox" style="display:none;">
-          <span style="font-size:18px;">❌</span>
           <span>오답입니다</span>
         </div>
 
@@ -1326,13 +1303,12 @@
           <button class="symbol-chip" data-sym="ca">$ca$</button>
         </div>
 
-        <button class="btn-verify-formula" id="btnVerifyFormula">정답 확인하기 ✨</button>
+        <button class="btn-verify-formula" id="btnVerifyFormula">정답 확인하기</button>
         <p id="formulaNotice" role="status"></p>
       </div>
 
       <!-- 성공 및 상징화 성취 알림 -->
       <div class="achievement-card" id="achievementCard" hidden>
-        <div class="achievement-icon">🏆</div>
         <div class="achievement-title">피타고라스 정리 발견!</div>
         <div class="achievement-desc">
           <strong>$a^{2} + b^{2} = c^{2}$</strong><br>
@@ -1379,7 +1355,6 @@
       // 물 채우기 애니메이션 상태 (0: a,b 채워짐 -> 1: c 채워짐)
       waterProgress: 0,
       isPouring: false,
-      waterDirection: 1, // 1: pour into c, -1: return to a,b
 
       // 퍼즐맞추기 상태
       puzzlePieces: [],
@@ -1506,7 +1481,6 @@
     let canvasW = 0;
     let canvasH = 0;
     let canvasDpr = 0;
-    let animFrameId = null;
 
     function resizeCanvas() {
       const rect = geometryStage.getBoundingClientRect();
@@ -1615,14 +1589,26 @@
     /* ========================================================
        5. 캔버스 렌더링 루프
        ======================================================== */
-    let waveOffset = 0;
+    const waterPourDuration = 4200;
+    const waterTravelShare = 0.16;
+    const proofAnimationDuration = 4000;
+    let lastFrameTime;
 
-    function render() {
+    function render(now = performance.now()) {
+      const elapsed = lastFrameTime === undefined ? 0 : Math.min(now - lastFrameTime, 60);
+      lastFrameTime = now;
+      if (State.isPouring) {
+        State.waterProgress = Math.min(1, State.waterProgress + elapsed / waterPourDuration);
+        if (State.waterProgress === 1) {
+          State.isPouring = false;
+          onWaterFillComplete();
+        }
+      }
       ctx.clearRect(0, 0, canvasW, canvasH);
       if (State.mode === 'puzzle') {
         renderPuzzleMode();
       } else if (State.mode === 'euclid') {
-        renderEuclidMode(computeGeometry());
+        renderEuclidMode(computeGeometry(), now);
       } else if (State.mode === 'water') {
         renderWaterMode();
       } else if (State.mode === 'data') {
@@ -1633,28 +1619,7 @@
         renderBaseTriangle(geom);
       }
 
-      // 애니메이션 업데이트 (물 붓기)
-      if (State.isPouring) {
-        if (State.waterDirection === 1) {
-          State.waterProgress += 0.02;
-          if (State.waterProgress >= 1) {
-            State.waterProgress = 1;
-            State.isPouring = false;
-            onWaterFillComplete();
-          }
-        } else {
-          State.waterProgress -= 0.025;
-          if (State.waterProgress <= 0) {
-            State.waterProgress = 0;
-            State.isPouring = false;
-            updatePourButtonUI();
-            saveProgress();
-          }
-        }
-      }
-
-      waveOffset += 0.05;
-      animFrameId = requestAnimationFrame(render);
+      requestAnimationFrame(render);
     }
 
     /* 5-1. 기본 직각삼각형 렌더링 */
@@ -1791,6 +1756,8 @@
     }
 
     function renderWaterMode() {
+      const remaining = Math.max(0, 1 - State.waterProgress / (1 - waterTravelShare));
+      const received = Math.max(0, (State.waterProgress - waterTravelShare) / (1 - waterTravelShare));
       const models = waterCases.map(({ angle }) => getWaterTriangle(angle));
       const column = canvasW / models.length;
       const top = 60;
@@ -1813,9 +1780,9 @@
           A: toScreen(model.A), B: toScreen(model.B), C: toScreen(model.C),
           sqA: model.sqA.map(toScreen), sqB: model.sqB.map(toScreen), sqC: model.sqC.map(toScreen)
         };
-        const { level, overflow, empty } = getWaterAmounts(model.capacity, State.waterProgress);
+        const { level, overflow, empty } = getWaterAmounts(model.capacity, received);
         drawLabel(title, x, y - 20, '#1e293b', 13);
-        renderWaterTriangle(geom, level, angle);
+        renderWaterTriangle(geom, remaining, level, angle);
 
         const captionY = y + height * scale + 18;
         const c = Number(Math.sqrt(model.capacity).toFixed(2));
@@ -1837,18 +1804,20 @@
       });
     }
 
-    function renderWaterTriangle(geom, level, angle) {
+    function renderWaterTriangle(geom, remaining, level, angle) {
       const { A, B, C, sqA, sqB, sqC } = geom;
       drawPolygon(sqA, '#f0f9ff', waterA.stroke, 1.5);
       drawPolygon(sqB, '#fff7ed', waterB.stroke, 1.5);
       drawPolygon(sqC, '#faf5ff', '#7c3aed', 1.5);
 
-      const remaining = 1 - State.waterProgress;
-      if (remaining > 0) {
-        drawWaterRegion(getWaterBand(sqA, remaining), waterA);
-        drawWaterRegion(getWaterBand(sqB, remaining), waterB);
+      const [blue, orange] = getHypotWaterRegions(sqC);
+      const surface = level > 0 ? getWaterSurface(sqC, level) : Math.max(...sqC.map(point => point.y));
+      drawWaterRegion(sqA, remaining, waterA);
+      drawWaterRegion(sqB, remaining, waterB);
+      if (level > 0) {
+        drawPolygon(clipWaterSurface(blue, surface), waterA.fill);
+        drawPolygon(clipWaterSurface(orange, surface), waterB.fill);
       }
-      if (level > 0) fillHypotSquareWater(sqC, level);
 
       drawPolygon([A, B, C], '#fff', '#334155', 1.5);
       const radians = angle * Math.PI / 180;
@@ -1861,7 +1830,10 @@
       ctx.stroke();
       ctx.restore();
 
-      if (State.isPouring && level > 0) renderWaterFlowLines(geom, level);
+      if (State.isPouring) {
+        renderWaterStream(sqA, blue, surface, waterA);
+        renderWaterStream(sqB, orange, surface, waterB);
+      }
       [
         [sqA, '$a^{2}$', '#075985'], [sqB, '$b^{2}$', '#9a3412'], [sqC, '$c^{2}$', '#5b21b6']
       ].forEach(([square, label, color]) => {
@@ -1872,6 +1844,7 @@
     }
 
     function drawPolygon(pts, fill, stroke, width = 2) {
+      if (pts.length < 3) return;
       ctx.beginPath();
       ctx.moveTo(pts[0].x, pts[0].y);
       for (let i = 1; i < pts.length; i++) {
@@ -1895,12 +1868,6 @@
       return { x: cx / pts.length, y: cy / pts.length };
     }
 
-    function getWaterBand(sq, level) {
-      const [start, outerStart, outerEnd, end] = sq;
-      return [start, interpolateWaterPoint(start, outerStart, level),
-        interpolateWaterPoint(end, outerEnd, level), end];
-    }
-
     function interpolateWaterPoint(from, to, ratio) {
       return {
         x: from.x + (to.x - from.x) * ratio,
@@ -1908,8 +1875,8 @@
       };
     }
 
-    function getHypotWaterRegions(sq, level) {
-      const [B, topB, topA, A] = getWaterBand(sq, level);
+    function getHypotWaterRegions(sq) {
+      const [B, topB, topA, A] = sq;
       const ratio = State.a2 / State.c2;
       const dividerBase = interpolateWaterPoint(B, A, ratio);
       const dividerTop = interpolateWaterPoint(topB, topA, ratio);
@@ -1919,50 +1886,101 @@
       ];
     }
 
-    function drawWaterRegion(region, color) {
-      drawPolygon(region, color.fill);
+    function clipWaterSurface(region, surface) {
+      const points = [];
+      for (let i = 0; i < region.length; i++) {
+        const start = region[i];
+        const end = region[(i + 1) % region.length];
+        if (start.y >= surface) points.push(start);
+        if ((start.y < surface && end.y > surface) || (start.y > surface && end.y < surface)) {
+          points.push(interpolateWaterPoint(start, end, (surface - start.y) / (end.y - start.y)));
+        }
+      }
+      return points;
+    }
+
+    function polygonArea(points) {
+      return Math.abs(points.reduce((area, point, index) => {
+        const next = points[(index + 1) % points.length];
+        return area + point.x * next.y - point.y * next.x;
+      }, 0)) / 2;
+    }
+
+    function drawWaterRegion(region, level, color) {
+      if (level <= 0) return;
+      drawPolygon(clipWaterSurface(region, getWaterSurface(region, level)), color.fill);
+    }
+
+    function getWaterSurface(region, level) {
+      const ys = region.map(point => point.y);
+      let top = Math.min(...ys);
+      if (level >= 1) return top;
+      const targetArea = polygonArea(region) * level;
+      let bottom = Math.max(...ys);
+      for (let i = 0; i < 12; i++) {
+        const surface = (top + bottom) / 2;
+        if (polygonArea(clipWaterSurface(region, surface)) > targetArea) top = surface;
+        else bottom = surface;
+      }
+      return (top + bottom) / 2;
+    }
+
+    function renderWaterStream(source, target, surface, color) {
+      const start = interpolateWaterPoint(source[0], source[3], 0.5);
+      const center = getPolygonCenter(target);
+      const lowerEdge = clipWaterSurface(target, surface).filter(point => Math.abs(point.y - surface) < 0.001);
+      const end = lowerEdge.length
+        ? { x: lowerEdge.reduce((sum, point) => sum + point.x, 0) / lowerEdge.length, y: surface }
+        : target.reduce((lowest, point) => point.y > lowest.y ? point : lowest, center);
+      const lift = Math.max(12, Math.min(42, Math.abs(start.x - end.x) * 0.3));
+      const crown = Math.min(start.y, end.y) - lift;
+      const controlA = { x: start.x, y: crown };
+      const controlB = { x: end.x, y: crown };
+      const head = Math.min(1, State.waterProgress / waterTravelShare);
+      const tail = Math.max(0, (State.waterProgress - (1 - waterTravelShare)) / waterTravelShare);
+      const pointAt = t => {
+        // A falling stream travels faster after it crests.
+        const position = t * (0.75 + t * 0.25);
+        const left = interpolateWaterPoint(start, controlA, position);
+        const middle = interpolateWaterPoint(controlA, controlB, position);
+        const right = interpolateWaterPoint(controlB, end, position);
+        return interpolateWaterPoint(interpolateWaterPoint(left, middle, position),
+          interpolateWaterPoint(middle, right, position), position);
+      };
+
       ctx.save();
-      ctx.strokeStyle = color.stroke;
-      ctx.lineWidth = 1.5;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
       ctx.beginPath();
-      ctx.moveTo(region[1].x, region[1].y);
-      ctx.lineTo(region[2].x, region[2].y);
+      const first = pointAt(tail);
+      ctx.moveTo(first.x, first.y);
+      for (let i = 1; i <= 24; i++) {
+        const point = pointAt(tail + (head - tail) * i / 24);
+        ctx.lineTo(point.x, point.y);
+      }
+      ctx.lineWidth = Math.max(2.5, Math.min(6, Math.hypot(start.x - end.x, start.y - end.y) * 0.13));
+      ctx.strokeStyle = color.fill;
       ctx.stroke();
-      ctx.restore();
-    }
-
-    function fillHypotSquareWater(sq, level) {
-      const [blue, orange] = getHypotWaterRegions(sq, level);
-      // 두 색 사이에 배경색 틈이 생기지 않도록 파랑 위에 주황 영역을 덮는다.
-      drawPolygon([blue[0], blue[1], orange[2], orange[3]], waterA.fill);
-      drawPolygon(orange, waterB.fill);
-
-      drawWaterRegion(blue, waterA);
-      drawWaterRegion(orange, waterB);
-    }
-
-    /* 물 붓기 애니메이션 중 흐르는 물줄기 */
-    function renderWaterFlowLines(geom, level) {
-      const { B, A, sqA, sqB, sqC } = geom;
-      const [blue, orange] = getHypotWaterRegions(sqC, level);
-      ctx.save();
-      ctx.globalAlpha = 0.8;
-      ctx.lineWidth = 2.5;
-      ctx.setLineDash([5, 4]);
-      ctx.lineDashOffset = -waveOffset * 10 * State.waterDirection;
-
-      [
-        { source: sqA, control: B, target: blue, color: waterA },
-        { source: sqB, control: A, target: orange, color: waterB }
-      ].forEach(({ source, control, target, color }) => {
-        const from = getPolygonCenter(source);
-        const to = getPolygonCenter(target);
-        ctx.strokeStyle = color.stroke;
+      ctx.fillStyle = '#fff';
+      ctx.globalAlpha = 0.65;
+      for (let i = 0; i < 7; i++) {
+        const t = (head + State.waterProgress * 8 + i / 7) % 1;
+        if (t < tail || t > head) continue;
+        const point = pointAt(t);
         ctx.beginPath();
-        ctx.moveTo(from.x, from.y);
-        ctx.quadraticCurveTo(control.x, control.y, to.x, to.y);
-        ctx.stroke();
-      });
+        ctx.arc(point.x, point.y, 0.9 + t * 0.35, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      if (head === 1) {
+        ctx.fillStyle = color.fill;
+        for (let i = 0; i < 5; i++) {
+          const phase = (State.waterProgress * 12 + i / 5) % 1;
+          ctx.globalAlpha = 1 - phase;
+          ctx.beginPath();
+          ctx.arc(end.x + (i - 2) * phase * 6, end.y - 36 * phase * (1 - phase), 1.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
       ctx.restore();
     }
 
@@ -2087,10 +2105,11 @@
     }
 
     /* 5-4. 모드 3: 증명해보기 */
-    function renderEuclidMode(geom) {
+    function renderEuclidMode(geom, now) {
       const { A, B, C, sqA, sqB, sqC } = geom;
       const step = State.euclidStep;
-      const t = Math.min(1, Math.max(0, (performance.now() - State.euclidStartedAt) / 1500));
+      const progress = Math.min(1, Math.max(0, (now - State.euclidStartedAt) / proofAnimationDuration));
+      const t = progress * progress * (3 - 2 * progress);
       const lerp = (p, q, progress) => ({
         x: p.x + (q.x - p.x) * progress,
         y: p.y + (q.y - p.y) * progress
@@ -2168,15 +2187,13 @@
     const valBoxC = document.getElementById('valBoxC');
     const tutorSpeech = document.getElementById('tutorSpeech');
     const btnPourWater = document.getElementById('btnPourWater');
-    const pourWaterText = document.getElementById('pourWaterText');
-    const pourWaterIcon = document.getElementById('pourWaterIcon');
     const btnRecordData = document.getElementById('btnRecordData');
     const dataTableBody = document.getElementById('dataTableBody');
     const recordBadge = document.getElementById('recordBadge');
     const btnSnapToggle = document.getElementById('btnSnapToggle');
     const snapIndicator = document.getElementById('snapIndicator');
     const canvasHint = document.getElementById('canvasHint');
-    const euclidBanner = document.getElementById('euclidBanner');
+    const euclidPrompt = document.getElementById('euclidPrompt');
     const modeTabs = [...document.querySelectorAll('.tab-btn')];
     const extensionTab = document.getElementById('tabExtend');
     const btnExtensionMode = document.getElementById('btnExtensionMode');
@@ -2210,9 +2227,9 @@
       btnExtensionMode.setAttribute('aria-pressed', mode === 'extend');
       btnProofMode.setAttribute('aria-pressed', mode === 'euclid');
       euclidTools.hidden = mode !== 'euclid';
-      euclidBanner.hidden = mode !== 'euclid';
+      euclidPrompt.hidden = mode !== 'euclid';
       puzzleDiscovery.hidden = true;
-      tutorSpeech.hidden = false;
+      tutorSpeech.hidden = mode === 'euclid';
 
       if (mode === 'water') {
         canvasHint.textContent = '물 붓기를 누르고 두 변 사이의 각에 따라 물이 얼마나 차는지 비교해 보세요.';
@@ -2225,7 +2242,6 @@
         setTutorSpeech('왼쪽 슬라이더로 여러 직각삼각형을 만들고 표에 기록해 봐. 세 변을 제곱한 수 사이에 어떤 규칙이 있을까?');
       } else if (mode === 'euclid') {
         canvasHint.textContent = '단계 버튼을 누르면 그 단계의 움직임을 다시 볼 수 있어요.';
-        setTutorSpeech('색칠된 삼각형이 움직이는 동안 무엇이 그대로인지 살펴보고, 보기에서 골라 빈칸을 채워봐!');
         selectProofStep(State.euclidStep);
       } else if (mode === 'tile') {
         setTutorSpeech('정사각형마다 넓이가 $s$인 삼각형이 몇 개 들어가는지 세어 봐.');
@@ -2295,7 +2311,7 @@
 
       if (!resetActivities) return;
       // 물 채우기 상태 리셋 (물이 차있었다면 자연스럽게 리셋)
-      if (State.waterProgress > 0) {
+      if (State.waterProgress > 0 || State.isPouring) {
         State.waterProgress = 0;
         State.isPouring = false;
         updatePourButtonUI();
@@ -2330,33 +2346,26 @@
     });
 
     function updateSnapIndicator() {
-      snapIndicator.textContent = State.snapTriples ? '🧲 자연수 c ON' : '🔓 자연수 c OFF';
+      snapIndicator.textContent = State.snapTriples ? '자연수 c ON' : '자연수 c OFF';
       btnSnapToggle.style.background = State.snapTriples ? '#eef2ff' : '#f1f5f9';
     }
 
     // 물 붓기 / 비우기 버튼
     btnPourWater.addEventListener('click', () => {
-      if (State.isPouring) return;
-      State.isPouring = true;
-      if (State.waterProgress < 0.5) {
-        State.waterDirection = 1; // pour into c
-        Sound.splash();
-        setTutorSpeech("세 삼각형에서 같은 양의 파란 물과 주황 물을 보내고 있어. 두 변 사이의 각에 따라 물이 얼마나 차는지 비교해 봐!");
+      if (State.waterProgress === 1) {
+        State.waterProgress = 0;
+        setTutorSpeech('다시 물을 부어서 어느 정사각형에서 물이 딱 맞는지 확인해 봐!');
       } else {
-        State.waterDirection = -1; // return
+        State.isPouring = true;
         Sound.splash();
+        setTutorSpeech('물줄기가 도착하면 보라색 정사각형의 물이 차오를 거야. 어느 각에서 물이 딱 맞을까?');
       }
       updatePourButtonUI();
     });
 
     function updatePourButtonUI() {
-      if (State.waterProgress >= 0.99) {
-        pourWaterText.textContent = '원위치로 되돌리기';
-        pourWaterIcon.textContent = '🔄';
-      } else {
-        pourWaterText.textContent = '물 붓기 시뮬레이션';
-        pourWaterIcon.textContent = '💧';
-      }
+      btnPourWater.disabled = State.isPouring;
+      btnPourWater.textContent = State.isPouring ? '물 붓는 중' : State.waterProgress === 1 ? '원위치로 되돌리기' : '물 붓기';
     }
 
     function onWaterFillComplete() {
@@ -2524,19 +2533,34 @@
     const proofSteps = [
       {
         title: '1단계 · 꼭짓점 옮기기',
-        lines: ['꼭짓점이 고정된 밑변과 ', '인 직선 위를 움직여요. 밑변과 높이가 그대로이므로 삼각형의 ', '도 같아요.'],
+        prompts: [
+          ['작은 정사각형에서 움직이지 않는 변을 삼각형의 밑변으로 보자. 반대편 꼭짓점이 밑변과 어떤 관계인 직선 위를 움직이면 높이가 그대로일까? 꼭짓점은 밑변과 ', '한 직선 위를 움직여.'],
+          ['밑변은 고정되어 있고, 꼭짓점에서 밑변까지의 수직 거리도 그대로야. 이 두 길이를 곱해서 2로 나누면 무엇을 구할 수 있지? 삼각형의 ', '가 같아.']
+        ],
+        hints: ['두 직선 사이의 거리가 일정한 경우를 생각해 봐.', '삼각형에서 밑변과 높이를 곱한 뒤 2로 나누는 공식을 떠올려 봐.'],
+        summary: '꼭짓점이 밑변과 평행한 직선 위를 움직이면 높이가 일정해서 넓이도 같아.',
         answers: ['평행', '넓이'],
         choices: ['수직', '둘레', '평행', '넓이']
       },
       {
         title: '2단계 · 꼭짓점을 중심으로 돌리기',
-        lines: ['색칠된 삼각형을 ', ' 돌렸어요. 두 변의 길이와 끼인각이 유지되므로 돌리기 전후 삼각형은 서로 ', ' 관계예요.'],
+        prompts: [
+          ['색칠된 삼각형에서 제자리에 있는 꼭짓점을 찾아봐. 그 점에서 뻗어 나온 변의 처음 방향과 마지막 방향이 직각을 이뤄. 삼각형을 몇 도 돌린 걸까? ', ' 돌렸어.'],
+          ['삼각형을 돌려도 변의 길이와 각의 크기는 그대로야. 돌리기 전과 후를 포개면 꼭 맞을 텐데, 두 삼각형의 이런 관계를 뭐라고 할까? 두 삼각형은 서로 ', '이야.']
+        ],
+        hints: ['한 바퀴의 4분의 1만큼 돌았어.', '모양과 크기가 같아 완전히 포개지는 도형에 쓰는 수학 용어를 떠올려 봐.'],
+        summary: '한 꼭짓점을 중심으로 $90^{\\circ}$ 돌려도 삼각형의 모양과 크기는 그대로라서 넓이도 같아.',
         answers: ['$90^{\\circ}$', '합동'],
         choices: ['$45^{\\circ}$', '합동', '$90^{\\circ}$', '대칭']
       },
       {
         title: '3단계 · 빗변 정사각형 안으로 옮기기',
-        lines: ['삼각형의 넓이는 옮기기 전후에 같아요. 각 삼각형은 대응하는 작은 정사각형과 빗변 쪽 직사각형에서 각각 넓이의 ', '이에요. 따라서 두 직사각형의 넓이를 더하면 ', '이 돼요.'],
+        prompts: [
+          ['파란 삼각형은 파란 직사각형과 밑변과 높이가 같아. 주황색도 같은 방법으로 비교해 봐. 삼각형 하나의 넓이는 같은 색 직사각형 넓이의 ', '이야.'],
+          ['파란 직사각형의 넓이는 밑변 위 정사각형과 같고, 주황 직사각형의 넓이는 높이 위 정사각형과 같아. 두 직사각형을 합치면 빗변 위 정사각형이 돼. 이 관계를 식으로 쓰면 ', '이야.']
+        ],
+        hints: ['밑변과 높이가 같을 때 직사각형과 삼각형의 넓이 공식을 비교해 봐.', '빗변 위 정사각형 전체의 넓이가 등호 오른쪽에 와야 해.'],
+        summary: '같은 색 삼각형의 넓이를 두 배 하면 작은 정사각형의 넓이이자 빗변 쪽 직사각형의 넓이야. 그래서 $a^{2} + b^{2} = c^{2}$가 성립해.',
         answers: ['절반', '$a^{2} + b^{2} = c^{2}$'],
         choices: ['전체', '$a + b = c$', '절반', '$a^{2} + b^{2} = c^{2}$']
       }
@@ -2558,34 +2582,34 @@
     function renderProofQuestion() {
       const step = proofSteps[State.euclidStep];
       const filled = proofAnswers[State.euclidStep];
+      const question = filled.length;
       proofTitle.textContent = step.title;
       proofDesc.replaceChildren();
-      step.lines.forEach((line, index) => {
-        proofDesc.append(line);
-        if (index < step.answers.length) {
-          const blank = document.createElement('span');
-          blank.className = 'proof-blank';
-          setMathText(blank, filled[index] || `빈칸 ${index + 1}`);
-          proofDesc.append(blank);
-        }
-      });
       proofChoices.replaceChildren();
-      const complete = filled.length === step.answers.length;
-      proofFeedback.textContent = complete ? '모든 빈칸을 채웠어요.' : `빈칸 ${filled.length + 1}에 넣을 보기를 골라보세요.`;
-      if (complete) return;
+      proofFeedback.textContent = '';
+      if (question === step.answers.length) {
+        setMathText(proofDesc, step.summary);
+        proofFeedback.textContent = '이 단계의 빈칸을 모두 채웠어요.';
+        return;
+      }
+      const [before, after] = step.prompts[question];
+      const blank = document.createElement('span');
+      blank.className = 'proof-blank';
+      blank.textContent = '빈칸';
+      proofDesc.append(before, blank, after);
 
       step.choices.forEach(choice => {
         const button = document.createElement('button');
         button.className = 'symbol-chip';
         setMathText(button, choice);
         button.addEventListener('click', () => {
-          if (choice === step.answers[filled.length]) {
+          if (choice === step.answers[question]) {
             filled.push(choice);
             renderProofQuestion();
             checkMissions();
             proofChoices.querySelector('button')?.focus();
           } else {
-            proofFeedback.textContent = '애니메이션을 보고 다른 보기를 골라보세요.';
+            proofFeedback.textContent = step.hints[question];
           }
         });
         proofChoices.append(button);
@@ -2918,7 +2942,7 @@
       const wrong = Boolean(State.isFormulaError);
       formulaEquationBox.style.display = wrong ? 'none' : 'flex';
       formulaErrorBox.style.display = wrong ? 'flex' : 'none';
-      btnVerifyFormula.textContent = wrong ? '다시 하기' : '정답 확인하기 ✨';
+      btnVerifyFormula.textContent = wrong ? '다시 하기' : '정답 확인하기';
       btnVerifyFormula.classList.toggle('retry-mode', wrong);
       document.getElementById('achievementCard').style.display = State.formulaSolved ? 'block' : '';
     }
@@ -2954,9 +2978,16 @@
     }
 
     // 소리 토글 버튼
-    document.getElementById('btnSoundToggle').addEventListener('click', (e) => {
+    const btnSoundToggle = document.getElementById('btnSoundToggle');
+
+    function updateSoundButton() {
+      btnSoundToggle.textContent = State.soundEnabled ? '소리 켜짐' : '소리 꺼짐';
+      btnSoundToggle.setAttribute('aria-pressed', State.soundEnabled);
+    }
+
+    btnSoundToggle.addEventListener('click', () => {
       State.soundEnabled = !State.soundEnabled;
-      e.target.textContent = State.soundEnabled ? '🔊' : '🔇';
+      updateSoundButton();
       if (State.soundEnabled) Sound.click();
     });
 
@@ -3087,7 +3118,7 @@
         localStorage.setItem(progressKey, JSON.stringify({
           mode: State.mode, a: State.a, b: State.b, snapTriples: State.snapTriples,
           soundEnabled: State.soundEnabled, waterProgress: State.waterProgress,
-          waterCompared: State.waterCompared, waterDirection: State.waterDirection, isPouring: State.isPouring,
+          waterCompared: State.waterCompared, isPouring: State.isPouring,
           records: State.records, formula: slots.map(slot => slot.dataset.val),
           formulaSolved: State.formulaSolved, formulaError: State.isFormulaError,
           tile: tileFields.map(field => getTileProgress(field, field.value)),
@@ -3133,11 +3164,11 @@
         State.snapTriples = saved.snapTriples !== false;
         updateSnapIndicator();
         State.soundEnabled = saved.soundEnabled !== false;
-        document.getElementById('btnSoundToggle').textContent = State.soundEnabled ? '🔊' : '🔇';
+        updateSoundButton();
         State.waterProgress = Math.max(0, Math.min(1, Number(saved.waterProgress) || 0));
         State.waterCompared = saved.waterCompared === true;
-        State.waterDirection = saved.waterDirection === -1 ? -1 : 1;
-        State.isPouring = saved.isPouring === true;
+        if (saved.isPouring === true && saved.waterDirection === -1) State.waterProgress = 0;
+        State.isPouring = saved.isPouring === true && saved.waterDirection !== -1 && State.waterProgress < 1;
         updatePourButtonUI();
 
         (Array.isArray(saved.records) ? saved.records : []).forEach(row => {
