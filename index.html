@@ -10,7 +10,7 @@
       --primary: #465c80;
       --primary-light: #e1e8f3;
       --primary-dark: #30415f;
-      --tutor-surface: #dceafb;
+      --tutor-surface: #edf5ff;
       --highlight: #fff4c7;
       --highlight-strong: #fbe7a1;
       --highlight-border: #e7d48d;
@@ -169,7 +169,7 @@
     }
 
     main[data-mode="data"] {
-      grid-template-columns: var(--left-panel-width) minmax(0, 1fr) clamp(360px, 32vw, 490px);
+      grid-template-columns: var(--left-panel-width) minmax(0, 1fr) clamp(480px, 36vw, 560px);
     }
 
     @media (max-width: 1100px) {
@@ -189,7 +189,10 @@
       padding: 10px;
       gap: 8px;
       overflow-y: auto;
+      scrollbar-gutter: stable;
     }
+
+    .panel-left > * { flex-shrink: 0; }
 
     /* 모드 탭 버튼 */
     .mode-tab-group {
@@ -751,8 +754,9 @@
       overflow-wrap: anywhere;
     }
 
-    .data-table th:nth-child(-n + 3) { width: 9%; }
-    .data-table th:nth-child(4) { width: 12%; }
+    .data-table th:nth-child(-n + 3) { width: 6%; }
+    .data-table th:nth-child(4) { width: 9%; }
+    .data-table th:nth-child(7) { width: 19%; }
 
     .data-table th {
       background: var(--surface-soft);
@@ -760,6 +764,7 @@
       font-weight: 700;
       padding: 7px 4px;
       border-bottom: 1px solid var(--border);
+      white-space: nowrap;
     }
 
     .data-table td {
@@ -946,6 +951,8 @@
 
     .worksheet {
       flex: 1 0 auto;
+      width: min(100%, 900px);
+      align-self: center;
       padding: clamp(10px, 1.5vw, 22px);
       display: grid;
       grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
@@ -964,11 +971,11 @@
     .worksheet figcaption { font-size: 15px; }
     #extensionActivity {
       grid-template-columns: minmax(0, 1fr);
-      align-content: start;
       justify-items: center;
       gap: 8px;
     }
-    .extension-problem { width: min(100%, 740px); }
+    .extension-problem { width: min(100%, 740px); text-align: center; }
+    #extensionActivity .symbol-chip-group, #extensionActivity .activity-actions { justify-content: center; }
     #extensionQuestion { margin-top: 6px; }
     #extensionProgress { font-size: 13px; color: var(--text-muted); }
     .worksheet ol { display: grid; gap: 8px; padding-left: 1.4em; margin: 8px 0; }
@@ -1004,17 +1011,21 @@
     @media (max-width: 930px) {
       body { height: auto; min-height: 100dvh; overflow: auto; }
       main, main[data-mode="data"] { grid-template-columns: 220px minmax(0, 1fr); height: auto; overflow: visible; }
+      .panel-left { align-self: start; height: 620px; }
       .panel-center { min-height: 620px; }
       .panel-right { grid-column: 1 / -1; }
     }
 
     @media (max-width: 640px) {
       main, main[data-mode="data"] { grid-template-columns: minmax(0, 1fr); }
+      .panel-left { height: min(560px, 62svh); }
+      .panel-right { padding-inline: 10px; }
       .data-table :is(th, td) { padding-inline: 2px; }
+      .data-table th { font-size: clamp(9px, 2.9vw, 13px); }
       .badge-curriculum { display: none; }
       .app-title { font-size: 16px; }
       .panel-center { min-height: 690px; }
-      .worksheet { grid-template-columns: minmax(0, 1fr); align-content: start; }
+      .worksheet { grid-template-columns: minmax(0, 1fr); }
       .worksheet svg { max-height: 150px; }
     }
   </style>
@@ -1809,7 +1820,7 @@
       const width = Math.max(...models.map(model => model.width));
       // 같은 길이의 변이 세 그림에서 화면상으로도 같은 길이가 되게 한다.
       const columnPadding = Math.min(64, Math.max(20, column * 0.18));
-      const scale = Math.min(Math.max(1, column - columnPadding) / width, Math.max(1, canvasH - top - bottom) / height);
+      const scale = 0.93 * Math.min(Math.max(1, column - columnPadding) / width, Math.max(1, canvasH - top - bottom) / height);
       const y = Math.max(top, (canvasH - bottom + top - height * scale) / 2);
       drawLabel(`세 삼각형의 공통 길이   $a = ${State.a}$   $b = ${State.b}$`, canvasW / 2, y - 46, shapeOutline, 12);
 
@@ -2048,7 +2059,7 @@
       const top = 26;
       const availableHeight = Math.max(1, canvasH - top - 20);
       const stacked = canvasW < 410 && availableHeight >= canvasW * 1.2;
-      const side = Math.max(1, 0.92 * Math.min(
+      const side = Math.max(1, 0.86 * Math.min(
         stacked ? canvasW - 24 : (canvasW - gap - 24) / 2,
         stacked ? (availableHeight - gap) / 2 : availableHeight
       ));
