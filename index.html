@@ -1225,7 +1225,7 @@
 
       <section class="worksheet" id="extensionActivity" aria-labelledby="extensionTitle" hidden>
         <figure>
-          <svg viewBox="0 0 240 190" role="img" aria-label="두 직각변 a, b의 길이가 서로 다른 직각삼각형. 빗변 길이는 c.">
+          <svg viewBox="0 0 240 190" role="img" aria-label="직각을 사이에 끼고있는 두 변의 길이는 각각 a, b이고, 빗변의 길이는 c인 직각삼각형.">
             <path d="M24 147H207V32Z" fill="var(--shape-a-light)" stroke="var(--shape-outline)" stroke-width="3"/>
             <path d="M192 147V132H207" fill="none" stroke="var(--shape-outline)" stroke-width="2"/>
             <g color="#1e293b" font-size="17" font-weight="700" aria-hidden="true">
@@ -1237,7 +1237,6 @@
         </figure>
         <div class="extension-problem">
           <h2 id="extensionTitle">직각삼각형으로 확장하기</h2>
-          <p>그림에서 두 직각변의 길이 $a, b$를 고정하고 다음 질문에 답해 보세요.</p>
           <p id="extensionQuestion"></p>
           <p id="extensionProgress"></p>
           <div class="symbol-chip-group" id="extensionChoices"></div>
@@ -2030,7 +2029,7 @@
       const top = 26;
       const availableHeight = Math.max(1, canvasH - top - 20);
       const stacked = canvasW < 410 && availableHeight >= canvasW * 1.2;
-      const side = Math.max(1, Math.min(
+      const side = Math.max(1, 0.92 * Math.min(
         stacked ? canvasW - 24 : (canvasW - gap - 24) / 2,
         stacked ? (availableHeight - gap) / 2 : availableHeight
       ));
@@ -2269,7 +2268,7 @@
       } else if (mode === 'tile') {
         setTutorSpeech('정사각형마다 넓이가 $s$인 삼각형이 몇 개 들어가는지 세어 봐.');
       } else {
-        setTutorSpeech('두 직각변을 고정하면 빗변의 길이는 어떻게 정해질까? 그림을 보고 생각해 봐.');
+        setTutorSpeech('그림에서 직각 표시를 찾아봐. 앞에서 본 타일 속 삼각형과 모양을 비교해 보자!');
       }
       geometryStage.parentElement.scrollTop = 0;
       resizeCanvas();
@@ -2474,17 +2473,17 @@
 
     const extensionSteps = [
       {
-        question: '두 변 $a, b$와 그 사이의 직각($90^{\\circ}$)이 같다면, 두 삼각형은 어떤 합동 조건을 만족할까요?',
+        question: '두 직각삼각형에서 직각을 사이에 끼고있는 두 변의 길이 $a, b$가 각각 같다면, 어떤 합동 조건을 만족할까요?',
         choices: ['SSS 합동', 'SAS 합동', 'ASA 합동'], answer: 1,
         hint: '주어진 것은 두 변과 그 두 변 사이의 각이에요.'
       },
       {
-        question: '두 직각변 $a, b$를 고정하면, 빗변 $c$의 길이는 몇 가지가 가능할까요?',
+        question: '앞 문제처럼 $a, b$의 길이를 고정하면, 빗변 $c$의 길이는 몇 가지가 가능할까요?',
         choices: ['한 가지', '두 가지', '여러 가지'], answer: 0,
         hint: '두 변과 끼인각이 같은 삼각형은 서로 합동이에요.'
       },
       {
-        question: '타일에서 찾은 넓이 관계를 두 직각변의 길이가 다른 경우에도 적용한다면, 어떤 식을 예상할 수 있을까요?',
+        question: '타일에서 찾은 넓이 관계를 직각을 사이에 끼고있는 두 변의 길이가 서로 다른 경우에도 적용하면, 어떤 식을 예상할 수 있을까요?',
         choices: ['$a + b = c$', '$a^{2} - b^{2} = c^{2}$', '$a^{2} + b^{2} = c^{2}$'], answer: 2,
         hint: '타일에서 직각을 이루는 두 변 위의 정사각형 넓이를 어떻게 비교했는지 떠올려 보세요.'
       }
@@ -2952,10 +2951,14 @@
       );
 
       if (isCorrect) {
+        const showDiscovery = !State.formulaSolved;
         State.formulaSolved = true;
         Sound.fanfare();
         triggerConfetti(window.innerWidth / 2, window.innerHeight / 2, 100);
         updateFormulaStatus();
+        if (showDiscovery) {
+          document.getElementById('achievementCard').scrollIntoView({ block: 'nearest', inline: 'nearest' });
+        }
         setTutorSpeech("🎉 대단해! 네가 직접 발견한 식이 바로 직각삼각형의 핵심 정리인 <strong>피타고라스 정리 ($a^{2} + b^{2} = c^{2}$)</strong>야!");
         checkMissions();
       } else {
