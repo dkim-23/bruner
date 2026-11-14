@@ -148,7 +148,7 @@
     main {
       flex: 1;
       display: grid;
-      grid-template-columns: 320px 1fr 280px;
+      grid-template-columns: 280px minmax(0, 1fr) 250px;
       height: calc(100vh - 56px);
       overflow: hidden;
       background: #f1f5f9;
@@ -156,7 +156,7 @@
 
     @media (max-width: 1100px) {
       main {
-        grid-template-columns: 290px 1fr 260px;
+        grid-template-columns: 240px minmax(0, 1fr) 225px;
       }
     }
 
@@ -168,9 +168,8 @@
       border-right: 1px solid var(--border);
       display: flex;
       flex-direction: column;
-      overflow-y: auto;
-      padding: 14px;
-      gap: 14px;
+      padding: 10px;
+      gap: 8px;
     }
 
     /* 모드 탭 버튼 */
@@ -195,7 +194,7 @@
 
     .mode-tabs {
       display: grid;
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 4px;
     }
 
@@ -203,7 +202,8 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 8px 10px;
+      padding: 6px;
+      min-height: 32px;
       background: #ffffff;
       border: 1px solid var(--border);
       border-radius: 8px;
@@ -275,7 +275,7 @@
     }
 
     .slider-row {
-      margin-bottom: 12px;
+      margin-bottom: 7px;
     }
 
     .slider-row:last-child {
@@ -463,10 +463,10 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 6px 8px;
+      padding: 3px 5px;
       border-radius: 8px;
       background: #f8fafc;
-      margin-bottom: 6px;
+      margin-bottom: 2px;
       font-size: 11px;
       font-weight: 600;
       transition: all 0.2s;
@@ -924,6 +924,67 @@
       pointer-events: none;
       z-index: 100;
     }
+
+    .worksheet {
+      position: absolute;
+      inset: 52px 0 0;
+      padding: clamp(10px, 1.5vw, 22px);
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+      align-content: safe center;
+      align-items: center;
+      gap: clamp(10px, 2vw, 24px);
+      overflow: auto;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .worksheet[hidden] { display: none; }
+    .worksheet h2 { font-size: 18px; margin-bottom: 6px; }
+    .worksheet figure { text-align: center; }
+    .worksheet svg { width: 100%; max-width: 280px; height: auto; display: block; margin: auto; }
+    .worksheet figcaption { font-size: 13px; }
+    .worksheet ol { display: grid; gap: 8px; padding-left: 1.4em; margin: 8px 0; }
+    .worksheet input {
+      display: block;
+      width: 100%;
+      padding: 5px 7px;
+      border: 1px solid #94a3b8;
+      border-radius: 5px;
+      background: white;
+      color: inherit;
+      font: inherit;
+      user-select: text;
+    }
+
+    .worksheet input[aria-invalid="true"] { border-color: #b91c1c; }
+    .worksheet [role="status"], #formulaNotice { font-size: 13px; color: #4338ca; margin-top: 6px; }
+    .worksheet .symbol-chip-group { justify-content: flex-start; margin-top: 6px; }
+    .worksheet .btn-action { margin-top: 6px; }
+    #puzzleDiscovery .symbol-chip-group { margin: 5px 0; }
+    #btnFullscreen { width: auto; padding: 0 9px; font-size: 13px; white-space: nowrap; }
+    #fullscreenNotice { position: fixed; right: 12px; top: 58px; z-index: 30; background: white; font-size: 13px; }
+
+    @media (max-height: 700px) {
+      body { overflow-y: auto; }
+      main { min-height: 620px; flex: 0 0 auto; }
+    }
+
+    @media (max-width: 930px) {
+      body { height: auto; min-height: 100dvh; overflow: auto; }
+      main { grid-template-columns: 220px minmax(0, 1fr); height: auto; overflow: visible; }
+      .panel-center { min-height: 620px; }
+      .panel-right { grid-column: 1 / -1; }
+    }
+
+    @media (max-width: 640px) {
+      main { grid-template-columns: minmax(0, 1fr); }
+      .badge-curriculum { display: none; }
+      .app-title { font-size: 14px; }
+      .panel-center { min-height: 690px; }
+      .worksheet { grid-template-columns: minmax(0, 1fr); align-content: start; }
+      .worksheet svg { max-height: 150px; }
+    }
   </style>
 </head>
 <body>
@@ -939,9 +1000,11 @@
     </div>
 
     <div class="header-right">
+      <button class="btn-icon" id="btnFullscreen" aria-pressed="false">전체화면</button>
       <button class="btn-icon" id="btnSoundToggle" title="소리 켜기/끄기">🔊</button>
     </div>
   </header>
+  <p id="fullscreenNotice" role="status"></p>
 
   <!-- 3분할 메인 레이아웃 -->
   <main>
@@ -954,15 +1017,23 @@
         </div>
         <div class="mission-item" id="mission1">
           <div class="mission-badge" id="mBadge1">1</div>
-          <span>빗변 c = 5 인 직각삼각형 만들기</span>
+          <span>세 각도에서 물 채우기 비교</span>
         </div>
         <div class="mission-item" id="mission2">
           <div class="mission-badge" id="mBadge2">2</div>
-          <span>두 넓이의 합(a²+b²)이 100이 되게 조절하기</span>
+          <span>타일로 세 정사각형의 넓이 비교</span>
         </div>
         <div class="mission-item" id="mission3">
           <div class="mission-badge" id="mBadge3">3</div>
-          <span>데이터 3회 기록 후 관계식 찾기</span>
+          <span>퍼즐을 옮겨 넓이 관계 찾기</span>
+        </div>
+        <div class="mission-item" id="mission4">
+          <div class="mission-badge" id="mBadge4">4</div>
+          <span>직각삼각형으로 확장하고 증명하기</span>
+        </div>
+        <div class="mission-item" id="mission5">
+          <div class="mission-badge" id="mBadge5">5</div>
+          <span>데이터를 기록하고 관계식 완성하기</span>
         </div>
       </div>
 
@@ -972,19 +1043,24 @@
         <div class="mode-tabs">
           <button class="tab-btn active" data-mode="water" id="tabWater">
             <span>💧 ① 물 채우기</span>
-            <span class="badge-req">필수</span>
+          </button>
+          <button class="tab-btn" data-mode="tile" id="tabTile">
+            <span>② 타일 분석하기</span>
           </button>
           <button class="tab-btn" data-mode="puzzle" id="tabPuzzle">
-            <span>🧩 ② 퍼즐맞추기</span>
+            <span>🧩 ③ 퍼즐맞추기</span>
           </button>
           <button class="tab-btn" data-mode="euclid" id="tabEuclid">
-            <span>📐 ③ 증명해보기</span>
+            <span>📐 ④ 증명해보기</span>
+          </button>
+          <button class="tab-btn" data-mode="extend" id="tabExtend">
+            <span>직각삼각형으로 확장</span>
           </button>
         </div>
       </div>
 
       <!-- 동적 삼각형 변 조작 카드 -->
-      <div class="control-card">
+      <div class="control-card" id="triangleControls">
         <div class="control-card-header">
           <div class="control-card-title">
             <span>📏 직각삼각형 변 조작</span>
@@ -1067,9 +1143,8 @@
             <span id="pourWaterIcon">💧</span> <span id="pourWaterText">물 붓기 시뮬레이션</span>
           </button>
 
-          <!-- 모드 2: 퍼즐 회전, 힌트 및 리셋 버튼 (모드 2일 때 표시) -->
+          <!-- 퍼즐 힌트 및 리셋 버튼 (모드 2일 때 표시) -->
           <div id="puzzleTools" style="display:none; gap:6px;">
-            <button class="btn-action" id="btnRotatePiece" title="선택된 조각을 90도 회전합니다">↻ 90° 회전</button>
             <button class="btn-action" id="btnPuzzleHint">🧩 자동맞춤</button>
             <button class="btn-action" id="btnPuzzleReset">🔄 조각 원위치</button>
           </div>
@@ -1095,6 +1170,59 @@
         <div class="symbol-chip-group" id="euclidChoices" role="group" aria-label="빈칸에 넣을 보기"></div>
         <div id="euclidFeedback" role="status"></div>
       </div>
+
+
+      <section class="worksheet" id="tileActivity" aria-labelledby="tileTitle" hidden>
+        <figure>
+          <svg viewBox="0 0 240 240" role="img" aria-labelledby="tileDiagramTitle">
+            <title id="tileDiagramTitle">그림 1. 위에서부터 A·E·D, F·I·H, B·G·C 순서의 점과 E·F·G·H를 잇는 정사각형. 삼각형 EFI가 색칠되어 있습니다.</title>
+            <rect x="32" y="32" width="176" height="176" fill="#fff"/>
+            <path d="M120 32 32 120 120 208 208 120Z" fill="#e0e7ff"/>
+            <path d="M120 32 32 120 120 120Z" fill="#a5b4fc"/>
+            <path d="M32 32H208V208H32Z M120 32V208 M32 120H208 M120 32 32 120 120 208 208 120Z"
+                  fill="none" stroke="#334155" stroke-width="2"/>
+            <path d="M108 120V108H120" fill="none" stroke="#334155" stroke-width="1.5"/>
+            <g fill="#1e293b" font-size="15" font-weight="700">
+              <text x="17" y="25">A</text><text x="115" y="23">E</text><text x="213" y="25">D</text>
+              <text x="14" y="125">F</text><text x="126" y="114">I</text><text x="215" y="125">H</text>
+              <text x="17" y="226">B</text><text x="114" y="228">G</text><text x="213" y="226">C</text>
+            </g>
+          </svg>
+          <figcaption><strong>그림 1</strong><br>네 타일은 모두 같은 크기의 정사각형이에요.<br>넓이(△AFE) = 넓이(△EFI) = 넓이(△EDH) = ⋯ = S</figcaption>
+        </figure>
+        <div>
+          <h2 id="tileTitle">문제 1 · 타일 분석하기</h2>
+          <p>△EFI의 세 변을 살펴보세요. 1~3번은 정사각형을 하나씩 찾아 꼭짓점을 둘레 순서대로 적고, 넓이를 S로 나타내세요.</p>
+          <ol>
+            <li><label>FI를 한 변으로 하는 정사각형<input id="tileFI" autocomplete="off" maxlength="36" placeholder="꼭짓점, 넓이"></label></li>
+            <li><label>EI를 한 변으로 하는 정사각형<input id="tileEI" autocomplete="off" maxlength="36" placeholder="꼭짓점, 넓이"></label></li>
+            <li><label>EF를 한 변으로 하는 정사각형<input id="tileEF" autocomplete="off" maxlength="36" placeholder="꼭짓점, 넓이"></label></li>
+            <li><label>1번과 2번의 넓이 합이 3번의 넓이와 같아요. FI, EI, EF로 관계식을 쓰세요.<input id="tileEquation" autocomplete="off" maxlength="45" placeholder="제곱은 ² 또는 ^2로 입력"></label></li>
+          </ol>
+          <button class="btn-action primary" id="btnCheckTile" type="button">답 확인</button>
+          <p id="tileFeedback" role="status"></p>
+        </div>
+      </section>
+
+      <section class="worksheet" id="extensionActivity" aria-labelledby="extensionTitle" hidden>
+        <figure>
+          <svg viewBox="0 0 240 190" role="img" aria-label="두 직각변 a, b의 길이가 서로 다른 직각삼각형. 빗변 길이는 c.">
+            <path d="M24 147H207V32Z" fill="#e0e7ff" stroke="#4338ca" stroke-width="3"/>
+            <path d="M192 147V132H207" fill="none" stroke="#4338ca" stroke-width="2"/>
+            <g fill="#1e293b" font-size="17" font-weight="700">
+              <text x="113" y="173">a</text><text x="218" y="95">b</text><text x="107" y="82">c</text>
+            </g>
+          </svg>
+          <figcaption>두 직각변의 길이 a, b를 고정해요.</figcaption>
+        </figure>
+        <div>
+          <h2 id="extensionTitle">직각삼각형으로 확장</h2>
+          <p id="extensionQuestion"></p>
+          <div class="symbol-chip-group" id="extensionChoices"></div>
+          <p id="extensionFeedback" role="status"></p>
+          <button class="btn-action primary" id="btnGoToProof" hidden>증명해보기 →</button>
+        </div>
+      </section>
 
       <!-- 메인 캔버스 엘리먼트 -->
       <canvas id="geometryCanvas"></canvas>
@@ -1170,6 +1298,7 @@
         </div>
 
         <button class="btn-verify-formula" id="btnVerifyFormula">정답 확인하기 ✨</button>
+        <p id="formulaNotice" role="status"></p>
       </div>
 
       <!-- 성공 및 상징화 성취 알림 -->
@@ -1200,7 +1329,7 @@
       get b2() { return this.b * this.b; },
       get c2() { return this.a2 + this.b2; },
 
-      // 모드: 'water' | 'puzzle' | 'euclid'
+      // 모드: 'water' | 'tile' | 'puzzle' | 'euclid' | 'extend'
       mode: 'water',
       
       // 스냅 기능 (무리수 방지 피타고라스 삼쌍 우선)
@@ -1235,14 +1364,10 @@
 
       // 데이터 표 기록
       records: [],
-      changeCount: 0,
-
-      // 미션 상태
-      missions: {
-        m1: false, // c = 5
-        m2: false, // a^2 + b^2 = 100
-        m3: false  // 3 records + formula solved
-      },
+      waterCompared: false,
+      tileSolved: false,
+      puzzleMissionDone: false,
+      extensionSolved: false,
 
       // 수식 슬롯
       slots: ['', '', ''],
@@ -1463,7 +1588,7 @@
         renderPuzzleMode();
       } else if (State.mode === 'euclid') {
         renderEuclidMode(computeGeometry());
-      } else {
+      } else if (State.mode === 'water') {
         renderWaterMode();
       }
 
@@ -1773,7 +1898,7 @@
     /* 5-3. 모드 2: 퍼즐맞추기 렌더링 */
     function initPuzzlePieces() {
       if (State.mode === 'puzzle' && State.puzzleSolved) showPuzzlePrompt();
-      State.puzzlePieces = ['#38bdf8', '#0284c7', '#fb923c', '#ea580c'].map((color, slot) => ({
+      State.puzzlePieces = ['#047857', '#0f766e', '#15803d', '#4d7c0f'].map((color, slot) => ({
         slot, color, w: State.a, h: State.b
       }));
       resetPuzzlePieces();
@@ -1822,7 +1947,6 @@
       const layout = getPuzzleLayout();
       State.selectedPiece = null;
       State.draggedPiece = null;
-      State.lastClickedPiece = null;
       State.puzzleSolved = false;
       State.puzzleDiscovered = false;
       State.puzzlePieces.forEach(p => {
@@ -1893,7 +2017,6 @@
         if (!State.puzzleSolved) {
           State.puzzleSolved = true;
           canvasHint.textContent = '회색은 조각이 있던 자리예요. 색칠 영역을 살펴보고 피타 쌤 아래의 질문에 답해 보세요.';
-          setTutorSpeech("조각을 모두 옮겼어! 옮기기 전에는 파랑과 주황 정사각형, 옮긴 뒤에는 보라 정사각형이 남아. 두 판을 보면서 아래 질문에 답해 봐.");
           showPuzzleQuestion(0);
         }
       }
@@ -1997,26 +2120,38 @@
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         State.mode = btn.dataset.mode;
-        if (State.mode !== 'puzzle') puzzleDiscovery.hidden = true;
+        const worksheetOpen = State.mode === 'tile' || State.mode === 'extend';
+        document.getElementById('tileActivity').hidden = State.mode !== 'tile';
+        document.getElementById('extensionActivity').hidden = State.mode !== 'extend';
+        document.getElementById('triangleControls').hidden = worksheetOpen;
+        canvas.style.visibility = worksheetOpen ? 'hidden' : '';
+        canvasHint.hidden = worksheetOpen;
+        btnRecordData.style.display = worksheetOpen ? 'none' : 'flex';
+        if (State.mode !== 'puzzle') {
+          puzzleDiscovery.hidden = true;
+          tutorSpeech.hidden = false;
+        }
         Sound.click();
 
         // 툴바 전환
         document.getElementById('btnPourWater').style.display = (State.mode === 'water') ? 'flex' : 'none';
         document.getElementById('puzzleTools').style.display = (State.mode === 'puzzle') ? 'flex' : 'none';
 
+        euclidBanner.style.display = State.mode === 'euclid' ? 'flex' : 'none';
         if (State.mode === 'water') {
-          if (euclidBanner) euclidBanner.style.display = 'none';
           canvasHint.innerHTML = '물 붓기를 누르고 두 변 사이의 각에 따라 물이 얼마나 차는지 비교해 보세요.';
           setTutorSpeech("직각삼각형의 변을 조절해보고, 세 정사각형의 넓이에 어떤 비밀이 숨어있는지 탐구해보자!");
         } else if (State.mode === 'puzzle') {
-          if (euclidBanner) euclidBanner.style.display = 'none';
           initPuzzlePieces();
           showPuzzlePrompt();
         } else if (State.mode === 'euclid') {
-          if (euclidBanner) euclidBanner.style.display = 'flex';
           canvasHint.textContent = '단계 버튼을 누르면 그 단계의 움직임을 다시 볼 수 있어요.';
           setTutorSpeech("색칠된 삼각형이 움직이는 동안 무엇이 그대로인지 살펴보고, 보기에서 골라 빈칸을 채워봐!");
           selectProofStep(0);
+        } else if (State.mode === 'tile') {
+          setTutorSpeech('타일을 나눈 삼각형의 넓이는 모두 S야. 정사각형마다 삼각형이 몇 개 들어가는지 세어 봐.');
+        } else {
+          setTutorSpeech('두 직각변을 고정하면 빗변의 길이는 어떻게 정해질까? 그림을 보고 생각해 봐.');
         }
       });
     });
@@ -2134,9 +2269,127 @@
 
     function onWaterFillComplete() {
       updatePourButtonUI();
+      State.waterCompared = true;
+      checkMissions();
       Sound.fanfare();
+      if (State.mode !== 'water') return;
       setTutorSpeech("파란 물은 a², 주황 물은 b²에서 왔어. 30°에서는 물이 넘치고, 90°에서는 딱 맞고, 120°에서는 빈 공간이 남아. 보낸 물의 양은 같은데 결과가 왜 다를까?");
     }
+
+    const tileSquares = [
+      { id: 'tileFI', vertices: ['AEIF', 'FIGB'], area: '2S' },
+      { id: 'tileEI', vertices: ['AEIF', 'EDHI'], area: '2S' },
+      { id: 'tileEF', vertices: ['EFGH'], area: '4S' }
+    ];
+    const tileEquation = document.getElementById('tileEquation');
+    const tileFeedback = document.getElementById('tileFeedback');
+
+    function matchesTileSquare(value, { vertices, area }) {
+      const match = value.toUpperCase().match(/^\s*(?:정사각형\s*)?([A-I](?:[\s,·]*[A-I]){3})\s*[,·:=，]?\s*(\d+)\s*[×*]?\s*S\s*$/);
+      if (!match || match[2] + 'S' !== area) return false;
+      const order = match[1].replace(/[^A-I]/g, '');
+      const reverse = [...order].reverse().join('');
+      return vertices.some(square => (square + square).includes(order) || (square + square).includes(reverse));
+    }
+
+    document.getElementById('btnCheckTile').addEventListener('click', () => {
+      const incorrect = [];
+      tileSquares.forEach((square, index) => {
+        const field = document.getElementById(square.id);
+        const correct = matchesTileSquare(field.value, square);
+        field.setAttribute('aria-invalid', String(!correct));
+        if (!correct) incorrect.push(index + 1);
+      });
+      const equation = tileEquation.value.toUpperCase().replace(/\s/g, '')
+        .replace(/\^2|²/g, '²').replace(/IF/g, 'FI').replace(/IE/g, 'EI').replace(/FE/g, 'EF');
+      const equationCorrect = /^(?:(?:FI²\+EI²|EI²\+FI²)=EF²|EF²=(?:FI²\+EI²|EI²\+FI²))$/.test(equation);
+      tileEquation.setAttribute('aria-invalid', String(!equationCorrect));
+      if (!equationCorrect) incorrect.push(4);
+      if (incorrect.length) {
+        tileFeedback.textContent = `${incorrect.join(', ')}번을 다시 살펴보세요. 정사각형을 이루는 삼각형의 개수와 변의 제곱을 확인해 보세요.`;
+        return;
+      }
+      tileFeedback.textContent = '맞았어요! 2S + 2S = 4S이므로 FI² + EI² = EF²예요.';
+      State.tileSolved = true;
+      checkMissions();
+    });
+
+    const extensionSteps = [
+      {
+        question: '두 변 a, b와 그 사이의 직각(90°)이 같다면, 두 삼각형은 어떤 합동 조건을 만족할까요?',
+        choices: ['SSS 합동', 'SAS 합동', 'ASA 합동'], answer: 1,
+        hint: '주어진 것은 두 변과 그 두 변 사이의 각이에요.'
+      },
+      {
+        question: '두 직각변 a, b를 고정하면, 빗변 c의 길이는 몇 가지가 가능할까요?',
+        choices: ['한 가지', '두 가지', '여러 가지'], answer: 0,
+        hint: '두 변과 끼인각이 같은 삼각형은 서로 합동이에요.'
+      },
+      {
+        question: '타일에서 찾은 넓이 관계를 두 직각변의 길이가 다른 경우에도 적용한다면, 어떤 식을 예상할 수 있을까요?',
+        choices: ['a + b = c', 'a² − b² = c²', 'a² + b² = c²'], answer: 2,
+        hint: '타일에서 직각을 이루는 두 변 위의 정사각형 넓이를 어떻게 비교했는지 떠올려 보세요.'
+      }
+    ];
+    const extensionQuestion = document.getElementById('extensionQuestion');
+    const extensionChoices = document.getElementById('extensionChoices');
+    const extensionFeedback = document.getElementById('extensionFeedback');
+    const btnGoToProof = document.getElementById('btnGoToProof');
+
+    function showExtensionStep(index) {
+      const step = extensionSteps[index];
+      extensionQuestion.textContent = `${index + 1}/${extensionSteps.length} · ${step.question}`;
+      extensionFeedback.textContent = '';
+      extensionChoices.replaceChildren();
+      step.choices.forEach((choice, choiceIndex) => {
+        const button = document.createElement('button');
+        button.className = 'symbol-chip';
+        button.textContent = choice;
+        button.addEventListener('click', () => {
+          if (choiceIndex !== step.answer) {
+            extensionFeedback.textContent = step.hint;
+            return;
+          }
+          if (index + 1 < extensionSteps.length) {
+            showExtensionStep(index + 1);
+            extensionChoices.querySelector('button').focus();
+            return;
+          }
+          extensionQuestion.textContent = '예상한 식은 a² + b² = c²예요.';
+          extensionFeedback.textContent = 'SAS 합동으로 빗변의 길이가 하나로 정해져요. 이제 증명 활동에서 예상한 넓이 관계가 성립하는 이유를 확인해 보세요.';
+          extensionChoices.replaceChildren();
+          btnGoToProof.hidden = false;
+          btnGoToProof.focus();
+          State.extensionSolved = true;
+          checkMissions();
+        });
+        extensionChoices.append(button);
+      });
+    }
+
+    showExtensionStep(0);
+    btnGoToProof.addEventListener('click', () => {
+      const proofTab = document.getElementById('tabEuclid');
+      proofTab.click();
+      proofTab.focus();
+    });
+
+    const btnFullscreen = document.getElementById('btnFullscreen');
+    const fullscreenNotice = document.getElementById('fullscreenNotice');
+    btnFullscreen.addEventListener('click', async () => {
+      fullscreenNotice.textContent = '';
+      try {
+        if (document.fullscreenElement) await document.exitFullscreen();
+        else await document.documentElement.requestFullscreen();
+      } catch {
+        fullscreenNotice.textContent = '이 브라우저에서 전체화면을 열 수 없어요.';
+      }
+    });
+    document.addEventListener('fullscreenchange', () => {
+      const active = Boolean(document.fullscreenElement);
+      btnFullscreen.textContent = active ? '전체화면 종료' : '전체화면';
+      btnFullscreen.setAttribute('aria-pressed', String(active));
+    });
 
     const proofSteps = [
       {
@@ -2199,6 +2452,7 @@
           if (choice === step.answers[filled.length]) {
             filled.push(choice);
             renderProofQuestion();
+            checkMissions();
             proofChoices.querySelector('button')?.focus();
           } else {
             proofFeedback.textContent = '애니메이션을 보고 다른 보기를 골라보세요.';
@@ -2224,7 +2478,7 @@
         hint: '조각을 옮기는 동안 조각을 자르거나 크기를 바꿨는지 살펴보세요.'
       },
       {
-        prompt: '두 판의 전체 넓이도, 조각이 덮는 넓이도 같아요. 남은 파랑과 주황을 합한 넓이는 보라색 넓이와 어떻게 비교될까요?',
+        prompt: '두 판의 전체 넓이도, 조각이 덮는 넓이도 같아요. 남은 파란 정사각형과 주황 정사각형의 넓이 합은 보라 정사각형의 넓이와 어떻게 비교될까요?',
         choices: ['더 작아요', '같아요', '더 커요'],
         answer: 1,
         hint: '크기가 같은 두 판에서 같은 넓이를 빼면 각각 얼마나 남을까요?'
@@ -2233,12 +2487,14 @@
 
     function showPuzzlePrompt() {
       puzzleDiscovery.hidden = true;
-      canvasHint.textContent = '삼각형을 같은 색 점선으로 옮겨 보세요. [자동맞춤]은 조각 옮기기를 도와줘요.';
+      tutorSpeech.hidden = false;
+      canvasHint.textContent = '초록 계열의 삼각형 조각을 같은 색 점선으로 옮겨 보세요. [자동맞춤]은 조각 옮기기를 도와줘요.';
       setTutorSpeech("크기가 같은 두 판이 있어. 첫 번째 판의 삼각형 네 조각을 두 번째 판으로 옮겨 봐. 조각이 덮지 않은 색칠 영역이 어떻게 달라지는지 살펴보자!");
     }
 
     function showPuzzleQuestion(index) {
       const question = puzzleQuestions[index];
+      tutorSpeech.hidden = true;
       puzzleDiscovery.hidden = false;
       puzzleQuestion.textContent = question.prompt;
       puzzleFeedback.textContent = '';
@@ -2255,8 +2511,10 @@
             puzzleChoices.querySelector('button').focus();
           } else {
             State.puzzleDiscovered = true;
+            State.puzzleMissionDone = true;
+            checkMissions();
             puzzleChoices.replaceChildren();
-            puzzleQuestion.textContent = '발견! 파랑과 주황을 합한 넓이는 보라색 넓이와 같아요.';
+            puzzleQuestion.textContent = '발견! 파란 정사각형과 주황 정사각형의 넓이 합은 보라 정사각형의 넓이와 같아요.';
             puzzleFeedback.textContent = '직각을 이루는 두 변의 길이가 a, b라면 파랑과 주황 정사각형의 넓이는 각각 a², b²예요. 빗변의 길이가 c라면 보라 정사각형의 넓이는 c²예요. 그래서 a² + b² = c². 이것이 피타고라스 정리예요!';
             canvasHint.textContent = '파랑 넓이 + 주황 넓이 = 보라 넓이   |   a² + b² = c²';
             const { target, side } = getPuzzleLayout();
@@ -2265,25 +2523,6 @@
           }
         });
         puzzleChoices.append(button);
-      });
-    }
-
-    // 퍼즐 조각 90도 회전 함수
-    function rotatePiece(p) {
-      if (!p || p.placed) return;
-      p.rot = ((p.rot || 0) + 90) % 360;
-      Sound.snap();
-    }
-
-    // 툴바의 90도 회전 버튼
-    const btnRotatePiece = document.getElementById('btnRotatePiece');
-    if (btnRotatePiece) {
-      btnRotatePiece.addEventListener('click', () => {
-        if (State.selectedPiece) {
-          rotatePiece(State.selectedPiece);
-        } else if (State.puzzlePieces.length > 0) {
-          rotatePiece(State.puzzlePieces[State.puzzlePieces.length - 1]);
-        }
       });
     }
 
@@ -2307,7 +2546,7 @@
     });
 
     /* ========================================================
-       7. 퍼즐맞추기 터치 및 드래그 인터랙션 (누르는 순서 무관 + 더블클릭 회전)
+       7. 퍼즐맞추기 터치 및 드래그
        ======================================================== */
     function getPointerPos(e) {
       const rect = canvas.getBoundingClientRect();
@@ -2342,16 +2581,7 @@
           State.selectedPiece = p;
           State.dragOffset = { x: pos.x - p.current.x, y: pos.y - p.current.y };
 
-          // 더블클릭 또는 더블탭 시 90도 회전
-          const now = Date.now();
-          if (State.lastClickedPiece === p && (now - (State.lastClickTime || 0) < 320)) {
-            rotatePiece(p);
-            State.lastClickTime = 0;
-          } else {
-            State.lastClickTime = now;
-            State.lastClickedPiece = p;
-            Sound.click();
-          }
+          Sound.click();
           break;
         }
       }
@@ -2369,9 +2599,8 @@
       const p = State.draggedPiece;
       const layout = getPuzzleLayout();
       const { center, rot } = getPuzzleTarget(p, layout);
-      const aligned = (p.rot - rot) % 360 === 0;
       const distance = Math.hypot(p.current.x - center.x, p.current.y - center.y);
-      if (aligned && distance < 22) {
+      if (distance < 22) {
         p.current = center;
         p.rot = rot;
         p.placed = true;
@@ -2409,6 +2638,7 @@
         c2: c2
       };
       State.records.push(recordItem);
+      formulaNotice.textContent = '';
 
       // 테이블 렌더링
       const formatValue = value => Number(value.toFixed(2));
@@ -2441,7 +2671,6 @@
       } else if (State.records.length === 2) {
         setTutorSpeech("데이터가 쌓이고 있어! 숫자들 사이에 어떤 덧셈 규칙이 숨어있을까?");
       } else if (State.records.length >= 3) {
-        checkMissions();
         setTutorSpeech("표의 숫자들을 찬찬히 살펴볼까? 왼쪽 두 수(a², b²)를 계산하면 오른쪽 수(c²)와 어떻게 연결될까?");
       }
     }
@@ -2459,11 +2688,18 @@
     const formulaEquationBox = document.getElementById('formulaEquationBox');
     const formulaErrorBox = document.getElementById('formulaErrorBox');
     const btnVerifyFormula = document.getElementById('btnVerifyFormula');
+    const formulaNotice = document.getElementById('formulaNotice');
+
+    function canCompleteFormula() {
+      if (State.records.length > 0) return true;
+      formulaNotice.textContent = '먼저 [표에 기록하기]를 눌러 탐구 데이터를 한 번 이상 기록하세요.';
+      return false;
+    }
 
     // 칩 클릭 시 빈 슬롯에 자동 채우기
     document.querySelectorAll('#symbolChipGroup .symbol-chip').forEach(chip => {
       chip.addEventListener('click', () => {
-        if (State.isFormulaError) return;
+        if (!canCompleteFormula() || State.isFormulaError) return;
         const sym = chip.dataset.sym;
         const emptySlot = slots.find(s => !s.dataset.val);
         if (emptySlot) {
@@ -2478,7 +2714,7 @@
     // 슬롯 클릭 시 비우기
     slots.forEach(slot => {
       slot.addEventListener('click', () => {
-        if (State.isFormulaError) return;
+        if (!canCompleteFormula() || State.isFormulaError) return;
         if (slot.dataset.val) {
           slot.textContent = '?';
           slot.dataset.val = '';
@@ -2490,6 +2726,7 @@
 
     // 수식 확인 / 다시 하기 버튼
     btnVerifyFormula.addEventListener('click', () => {
+      if (!canCompleteFormula()) return;
       // 1) 다시 하기 모드일 때
       if (State.isFormulaError) {
         slots.forEach(s => {
@@ -2540,38 +2777,20 @@
        9. 미니 미션 판정기
        ======================================================== */
     function checkMissions() {
-      // 미션 1: 빗변 c = 5 (a=3, b=4)
-      if (Math.abs(State.c - 5) < 0.1) {
-        if (!State.missions.m1) {
-          State.missions.m1 = true;
-          markMissionCompleted('mission1', 'mBadge1');
-        }
-      }
-
-      // 미션 2: a^2 + b^2 = 100 (a=6, b=8)
-      if (State.a2 + State.b2 === 100) {
-        if (!State.missions.m2) {
-          State.missions.m2 = true;
-          markMissionCompleted('mission2', 'mBadge2');
-        }
-      }
-
-      // 미션 3: 데이터 3회 기록 + 공식 완성
-      if (State.records.length >= 3 && State.formulaSolved) {
-        if (!State.missions.m3) {
-          State.missions.m3 = true;
-          markMissionCompleted('mission3', 'mBadge3');
-        }
-      }
+      const proofComplete = proofSteps.every((step, index) => proofAnswers[index].length === step.answers.length);
+      const completed = [State.waterCompared, State.tileSolved, State.puzzleMissionDone,
+        State.extensionSolved && proofComplete, State.formulaSolved];
+      completed.forEach((done, index) => {
+        if (done) markMissionCompleted(`mission${index + 1}`, `mBadge${index + 1}`);
+      });
     }
 
     function markMissionCompleted(itemId, badgeId) {
       const item = document.getElementById(itemId);
       const badge = document.getElementById(badgeId);
-      if (item && badge) {
+      if (item && badge && !item.classList.contains('completed')) {
         item.classList.add('completed');
         badge.textContent = '✓';
-        Sound.fanfare();
       }
     }
 
