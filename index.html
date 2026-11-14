@@ -676,9 +676,15 @@
       border-left: 1px solid var(--border);
       display: flex;
       flex-direction: column;
+      min-height: 0;
+      min-width: 0;
       overflow-y: auto;
       padding: 14px;
       gap: 14px;
+    }
+
+    .panel-right > * {
+      flex-shrink: 0;
     }
 
     .section-title {
@@ -723,7 +729,8 @@
       background: #ffffff;
       border: 1px solid var(--border);
       border-radius: 10px;
-      overflow-x: auto;
+      max-height: 15rem;
+      overflow: auto;
       box-shadow: var(--shadow-sm);
     }
 
@@ -1250,7 +1257,7 @@
     </section>
 
     <!-- [우측 패널 20%] 데이터 및 상징화 노트 (Symbolic) -->
-    <aside class="panel-right">
+    <aside class="panel-right" aria-label="탐구 기록 및 관계식" tabindex="0">
       <div class="progress-controls">
         <p id="progressStatus" role="status">학습 기록은 이 브라우저에만 저장돼요.</p>
         <button class="btn-subtle" id="btnClearProgress" type="button" hidden>학습 기록 지우기</button>
@@ -1258,11 +1265,11 @@
 
       <!-- 탐구 데이터 표 -->
       <div class="section-title">
-        <span>탐구 데이터 표</span>
+        <span id="dataTableTitle">탐구 데이터 표</span>
         <span class="record-count-badge" id="recordBadge">기록 0회</span>
       </div>
 
-      <div class="table-container">
+      <div class="table-container" id="dataTableScroll" role="region" aria-labelledby="dataTableTitle" tabindex="0">
         <table class="data-table" id="dataTable">
           <thead>
             <tr>
@@ -2215,6 +2222,7 @@
     const btnPourWater = document.getElementById('btnPourWater');
     const btnRecordData = document.getElementById('btnRecordData');
     const dataTableBody = document.getElementById('dataTableBody');
+    const dataTableScroll = document.getElementById('dataTableScroll');
     const recordBadge = document.getElementById('recordBadge');
     const btnSnapToggle = document.getElementById('btnSnapToggle');
     const snapIndicator = document.getElementById('snapIndicator');
@@ -2834,7 +2842,7 @@
       appendDataRow(recordItem);
 
       // 스크롤 최하단
-      dataTableBody.parentElement.parentElement.scrollTop = dataTableBody.parentElement.parentElement.scrollHeight;
+      dataTableScroll.scrollTop = dataTableScroll.scrollHeight;
 
       recordBadge.textContent = `기록 ${State.records.length}회`;
       Sound.snap();
