@@ -1223,8 +1223,10 @@
           <svg viewBox="0 0 240 190" role="img" aria-label="두 직각변 a, b의 길이가 서로 다른 직각삼각형. 빗변 길이는 c.">
             <path d="M24 147H207V32Z" fill="#e0e7ff" stroke="#4338ca" stroke-width="3"/>
             <path d="M192 147V132H207" fill="none" stroke="#4338ca" stroke-width="2"/>
-            <g fill="#1e293b" font-size="17" font-weight="700">
-              <text x="113" y="173">a</text><text x="218" y="95">b</text><text x="107" y="82">c</text>
+            <g color="#1e293b" font-size="17" font-weight="700" aria-hidden="true">
+              <foreignObject x="113" y="153" width="24" height="26"><div data-diagram-math>$a$</div></foreignObject>
+              <foreignObject x="216" y="75" width="24" height="26"><div data-diagram-math>$b$</div></foreignObject>
+              <foreignObject x="107" y="62" width="24" height="26"><div data-diagram-math>$c$</div></foreignObject>
             </g>
           </svg>
           <figcaption>두 직각변의 길이 $a, b$를 고정해요.</figcaption>
@@ -2173,7 +2175,7 @@
         document.getElementById('triangleControls').hidden = worksheetOpen;
         canvas.style.visibility = worksheetOpen ? 'hidden' : '';
         canvasHint.hidden = worksheetOpen;
-        btnRecordData.style.display = worksheetOpen ? 'none' : 'flex';
+        btnRecordData.style.display = worksheetOpen || State.mode === 'euclid' ? 'none' : 'flex';
         if (State.mode !== 'puzzle') {
           puzzleDiscovery.hidden = true;
           tutorSpeech.hidden = false;
@@ -3099,7 +3101,9 @@
 
     window.addEventListener('DOMContentLoaded', () => {
       const staticMath = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
-        acceptNode: node => node.parentElement.closest('script, style, svg, math') || !/\$[^$]+\$/.test(node.data)
+        acceptNode: node => node.parentElement.closest('script, style, math') ||
+          (node.parentElement.closest('svg') && !node.parentElement.matches('[data-diagram-math]')) ||
+          !/\$[^$]+\$/.test(node.data)
           ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT
       });
       const mathNodes = [];
