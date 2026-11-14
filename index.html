@@ -3,25 +3,37 @@
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>피타고라스 정리 탐구 연구소 - 2022 개정 중2 수학 (브루너 EIS 모델)</title>
   <style>
     :root {
-      --primary: #4361ee;
-      --primary-light: #eef2ff;
-      --primary-dark: #2a3eb1;
-      --secondary: #3f37c9;
-      --accent: #f72585;
-      --aqua: #4cc9f0;
-      --orange: #f8961e;
-      --green: #2ec4b6;
-      --success: #10b981;
-      --bg-dark: #0f172a;
-      --bg-panel: #ffffff;
-      --bg-canvas: #f8fafc;
-      --border: #e2e8f0;
-      --text-main: #1e293b;
-      --text-muted: #64748b;
+      --primary: #465c80;
+      --primary-light: #e1e8f3;
+      --primary-dark: #30415f;
+      --tutor-surface: #bdcce1;
+      --surface-soft: #f4f6fa;
+      --surface-tint: #e9eef5;
+      --bg-panel: #f1f4f9;
+      --bg-canvas: #fcfaf7;
+      --border: #ced7e4;
+      --border-strong: #8392aa;
+      --text-main: #202a3c;
+      --text-muted: #47566e;
+      --shape-a: #d6a85f;
+      --shape-a-light: #f3e4c5;
+      --shape-a-ink: #805719;
+      --shape-b: #d28a71;
+      --shape-b-light: #f4dfd6;
+      --shape-b-ink: #8e4936;
+      --shape-c: #bda082;
+      --shape-c-light: #eee5d9;
+      --shape-c-ink: #70533d;
+      --shape-neutral: #e7dfd5;
+      --shape-outline: #6a5b50;
+      --piece-1: #a06e36;
+      --piece-2: #ad6048;
+      --piece-3: #745a83;
+      --piece-4: #756247;
       --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
       --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.06);
       --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.05);
@@ -38,7 +50,9 @@
 
     body {
       font-family: var(--font-family);
-      background-color: #f1f5f9;
+      font-size: 16px;
+      line-height: 1.5;
+      background-color: var(--surface-tint);
       color: var(--text-main);
       height: 100vh;
       overflow: hidden;
@@ -76,10 +90,10 @@
     }
 
     .badge-curriculum {
-      font-size: 11px;
+      font-size: 13px;
       font-weight: 600;
-      background: #e0e7ff;
-      color: #3730a3;
+      background: var(--primary-light);
+      color: var(--primary-dark);
       padding: 2px 8px;
       border-radius: 12px;
     }
@@ -88,14 +102,14 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      background: #f8fafc;
+      background: var(--surface-soft);
       padding: 4px 10px;
       border-radius: 20px;
       border: 1px solid var(--border);
     }
 
     .eis-step {
-      font-size: 12px;
+      font-size: 14px;
       font-weight: 600;
       color: var(--text-muted);
       display: flex;
@@ -112,7 +126,7 @@
     }
 
     .eis-arrow {
-      color: #cbd5e1;
+      color: var(--border-strong);
       font-size: 10px;
     }
 
@@ -123,7 +137,7 @@
     }
 
     .btn-icon {
-      background: #f1f5f9;
+      background: var(--surface-tint);
       border: 1px solid var(--border);
       border-radius: 8px;
       width: 38px;
@@ -137,7 +151,7 @@
     }
 
     .btn-icon:hover {
-      background: #e2e8f0;
+      background: var(--border);
     }
 
     /* 메인 3단 레이아웃 (태블릿 가로 30% : 50% : 20%) */
@@ -147,7 +161,7 @@
       grid-template-columns: 280px minmax(0, 1fr) 250px;
       height: calc(100vh - 56px);
       overflow: hidden;
-      background: #f1f5f9;
+      background: var(--surface-tint);
     }
 
     @media (max-width: 1100px) {
@@ -174,14 +188,14 @@
       display: flex;
       flex-direction: column;
       gap: 6px;
-      background: #f8fafc;
+      background: var(--surface-soft);
       padding: 6px;
       border-radius: 12px;
       border: 1px solid var(--border);
     }
 
     .mode-tab-title {
-      font-size: 11px;
+      font-size: 13px;
       font-weight: 700;
       color: var(--text-muted);
       text-transform: uppercase;
@@ -204,7 +218,7 @@
       background: #ffffff;
       border: 1px solid var(--border);
       border-radius: 8px;
-      font-size: 13px;
+      font-size: 15px;
       font-weight: 600;
       color: var(--text-main);
       cursor: pointer;
@@ -225,7 +239,7 @@
       background: var(--primary);
       color: #ffffff;
       border-color: var(--primary);
-      box-shadow: 0 2px 4px rgba(67, 97, 238, 0.3);
+      box-shadow: var(--shadow-sm);
     }
 
     .tab-btn.active .badge-req {
@@ -244,13 +258,15 @@
 
     .control-card-header {
       display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 10px;
     }
 
     .control-card-title {
-      font-size: 13px;
+      font-size: 15px;
       font-weight: 700;
       color: var(--text-main);
       display: flex;
@@ -262,11 +278,11 @@
       display: flex;
       align-items: center;
       gap: 5px;
-      font-size: 11px;
+      font-size: 13px;
       font-weight: 600;
-      color: #4338ca;
+      color: var(--primary-dark);
       cursor: pointer;
-      background: #eef2ff;
+      background: var(--primary-light);
       padding: 3px 8px;
       border-radius: 12px;
     }
@@ -281,8 +297,10 @@
 
     .slider-label-row {
       display: flex;
+      flex-wrap: wrap;
+      column-gap: 6px;
       justify-content: space-between;
-      font-size: 12px;
+      font-size: 14px;
       font-weight: 600;
       margin-bottom: 4px;
     }
@@ -295,11 +313,19 @@
       margin-right: 5px;
     }
 
+    .side-a { color: var(--shape-a-ink); }
+    .side-b { color: var(--shape-b-ink); }
+    .side-c { color: var(--shape-c-ink); }
+    .color-indicator.side-a { background: var(--shape-a); }
+    .color-indicator.side-b { background: var(--shape-b); }
+    .color-indicator.side-c { background: var(--shape-c); }
+    .slider-label-row.c-value { padding: 4px 6px; border-radius: 6px; background: var(--surface-tint); }
+
     .slider-val-box {
-      font-size: 12px;
+      font-size: 14px;
       font-weight: 700;
       color: var(--primary-dark);
-      background: #f1f5f9;
+      background: var(--surface-tint);
       padding: 1px 6px;
       border-radius: 6px;
     }
@@ -308,7 +334,7 @@
       width: 100%;
       height: 8px;
       border-radius: 4px;
-      background: #e2e8f0;
+      background: var(--border);
       outline: none;
       -webkit-appearance: none;
       cursor: pointer;
@@ -339,10 +365,10 @@
     }
 
     .triplet-btn {
-      background: #f8fafc;
+      background: var(--surface-soft);
       border: 1px solid var(--border);
       border-radius: 6px;
-      font-size: 11px;
+      font-size: 13px;
       font-weight: 700;
       color: var(--text-main);
       padding: 5px 0;
@@ -352,21 +378,21 @@
     }
 
     .triplet-btn:hover {
-      background: #eef2ff;
+      background: var(--primary-light);
       border-color: var(--primary);
       color: var(--primary);
     }
 
     .triplet-btn.active {
-      background: #4361ee;
+      background: var(--primary);
       color: #fff;
-      border-color: #4361ee;
+      border-color: var(--primary);
     }
 
     /* AI 튜터 캐릭터 & 대화창 */
     .tutor-card {
-      background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%);
-      border: 1px solid #bae6fd;
+      background: var(--tutor-surface);
+      border: 1px solid var(--border-strong);
       border-radius: 12px;
       padding: 8px 10px;
       display: grid;
@@ -387,7 +413,7 @@
       width: 36px;
       height: 36px;
       border-radius: 50%;
-      background: #38bdf8;
+      background: var(--primary);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -407,26 +433,26 @@
     }
 
     .tutor-name {
-      font-size: 12px;
+      font-size: 14px;
       font-weight: 800;
-      color: #0369a1;
+      color: var(--primary-dark);
     }
 
     .tutor-role {
       font-size: 10px;
-      color: #0284c7;
+      color: var(--primary);
     }
 
     .tutor-speech-bubble {
       background: #ffffff;
       border-radius: 10px;
       padding: 7px 10px;
-      font-size: 12px;
-      line-height: 1.45;
-      color: #0f172a;
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--text-main);
       box-shadow: 0 1px 3px rgba(0,0,0,0.05);
       position: relative;
-      border: 1px solid #e0f2fe;
+      border: 1px solid var(--border);
     }
 
     .tutor-speech-bubble::before {
@@ -449,7 +475,7 @@
     }
 
     .mission-title {
-      font-size: 12px;
+      font-size: 14px;
       font-weight: 700;
       color: var(--text-main);
       margin-bottom: 8px;
@@ -464,35 +490,36 @@
       gap: 8px;
       padding: 3px 5px;
       border-radius: 8px;
-      background: #f8fafc;
+      background: var(--surface-soft);
       margin-bottom: 2px;
-      font-size: 11px;
+      font-size: 13px;
       font-weight: 600;
       transition: all 0.2s;
     }
 
     .mission-item.completed {
-      background: #ecfdf5;
-      color: #065f46;
-      border: 1px solid #a7f3d0;
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      border: 1px solid var(--border);
     }
 
     .mission-badge {
       width: 18px;
       height: 18px;
       border-radius: 50%;
-      background: #cbd5e1;
-      color: #ffffff;
+      background: var(--border-strong);
+      color: var(--primary-dark);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 10px;
+      font-size: 11px;
       font-weight: 800;
       flex-shrink: 0;
     }
 
     .mission-item.completed .mission-badge {
-      background: #10b981;
+      background: var(--primary);
+      color: #fff;
     }
 
     /* ========================================================
@@ -528,7 +555,7 @@
       border: 1px solid var(--border);
       border-radius: 20px;
       padding: 7px 14px;
-      font-size: 13px;
+      font-size: 15px;
       font-weight: 700;
       color: var(--text-main);
       display: flex;
@@ -540,7 +567,7 @@
     }
 
     .btn-action:hover {
-      background: #f8fafc;
+      background: var(--surface-soft);
       transform: translateY(-1px);
     }
 
@@ -560,13 +587,13 @@
     }
 
     .btn-action.accent {
-      background: #10b981;
+      background: var(--primary);
       color: #ffffff;
-      border-color: #10b981;
+      border-color: var(--primary);
     }
 
     .btn-action.accent:hover {
-      background: #059669;
+      background: var(--primary-dark);
     }
 
     #euclidTools {
@@ -579,7 +606,7 @@
     }
 
     .canvas-toolbar [aria-pressed="true"] {
-      background: #7c3aed;
+      background: var(--primary);
       color: #fff;
     }
 
@@ -587,14 +614,14 @@
       display: inline-block;
       min-width: 3em;
       padding: 1px 5px;
-      border: 1px dashed #7c3aed;
+      border: 1px dashed var(--primary);
       border-radius: 4px;
       text-align: center;
-      color: #5b21b6;
+      color: var(--primary-dark);
     }
 
     #euclidFeedback {
-      color: #5b21b6;
+      color: var(--primary-dark);
     }
 
     #euclidStepDesc { margin-top: 4px; }
@@ -653,7 +680,7 @@
       color: #ffffff;
       padding: 6px 16px;
       border-radius: 20px;
-      font-size: 12px;
+      font-size: 14px;
       font-weight: 600;
       pointer-events: none;
       z-index: 10;
@@ -674,7 +701,7 @@
     }
 
     .section-title {
-      font-size: 13px;
+      font-size: 15px;
       font-weight: 800;
       color: var(--text-main);
       display: flex;
@@ -683,7 +710,7 @@
     }
 
     .btn-subtle {
-      font-size: 11px;
+      font-size: 13px;
       color: var(--text-muted);
       background: none;
       border: none;
@@ -693,7 +720,7 @@
     }
 
     .btn-subtle:hover {
-      background: #e2e8f0;
+      background: var(--border);
       color: var(--text-main);
     }
 
@@ -706,7 +733,7 @@
     }
 
     #progressStatus {
-      font-size: 12px;
+      font-size: 14px;
       color: var(--text-muted);
     }
 
@@ -723,12 +750,12 @@
       width: 100%;
       min-width: 400px;
       border-collapse: collapse;
-      font-size: 11px;
+      font-size: 13px;
       text-align: center;
     }
 
     .data-table th {
-      background: #f8fafc;
+      background: var(--surface-soft);
       color: var(--text-muted);
       font-weight: 700;
       padding: 7px 4px;
@@ -737,7 +764,7 @@
 
     .data-table td {
       padding: 6px 4px;
-      border-bottom: 1px solid #f1f5f9;
+      border-bottom: 1px solid var(--surface-tint);
       font-weight: 600;
       color: var(--text-main);
     }
@@ -747,37 +774,37 @@
     }
 
     .data-table tr.highlight-row {
-      background: #f0fdf4;
+      background: var(--surface-soft);
       animation: highlightFade 1.5s ease-out;
     }
 
     .data-table .val-sum {
-      color: #2563eb;
+      color: var(--primary-dark);
       font-weight: 800;
     }
 
     .data-table .val-c2 {
-      color: #7c3aed;
+      color: var(--primary);
       font-weight: 800;
     }
 
     .data-table .val-match {
-      background: #dcfce7;
-      color: #15803d;
+      background: var(--primary-light);
+      color: var(--primary-dark);
       border-radius: 4px;
       padding: 1px 3px;
     }
 
     @keyframes highlightFade {
-      0% { background: #bbf7d0; }
-      100% { background: #f0fdf4; }
+      0% { background: var(--primary-light); }
+      100% { background: var(--surface-soft); }
     }
 
     .record-count-badge {
-      font-size: 11px;
+      font-size: 13px;
       font-weight: 600;
-      color: #4338ca;
-      background: #e0e7ff;
+      color: var(--primary-dark);
+      background: var(--primary-light);
       padding: 2px 7px;
       border-radius: 10px;
     }
@@ -795,9 +822,9 @@
     }
 
     .builder-question {
-      font-size: 12px;
+      font-size: 14px;
       font-weight: 700;
-      color: #1e293b;
+      color: var(--text-main);
       line-height: 1.4;
     }
 
@@ -806,10 +833,10 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
-      background: #f8fafc;
+      background: var(--surface-soft);
       padding: 12px 6px;
       border-radius: 10px;
-      border: 2px dashed #cbd5e1;
+      border: 2px dashed var(--border-strong);
     }
 
     .formula-slot {
@@ -829,15 +856,15 @@
     }
 
     .formula-slot.empty {
-      border: 2px dashed #94a3b8;
-      background: #f8fafc;
-      color: #94a3b8;
+      border: 2px dashed var(--border-strong);
+      background: var(--surface-soft);
+      color: var(--border-strong);
     }
 
     .operator-symbol {
       font-size: 16px;
       font-weight: 800;
-      color: #475569;
+      color: var(--text-muted);
     }
 
     /* 선택 칩 */
@@ -849,11 +876,11 @@
     }
 
     .symbol-chip {
-      background: #f1f5f9;
-      border: 1px solid #cbd5e1;
+      background: var(--surface-tint);
+      border: 1px solid var(--border-strong);
       padding: 5px 10px;
       border-radius: 8px;
-      font-size: 13px;
+      font-size: 15px;
       font-weight: 700;
       color: var(--text-main);
       cursor: pointer;
@@ -861,8 +888,8 @@
     }
 
     .symbol-chip:hover {
-      background: #e2e8f0;
-      border-color: #94a3b8;
+      background: var(--border);
+      border-color: var(--border-strong);
       transform: translateY(-1px);
     }
 
@@ -873,7 +900,7 @@
       border: none;
       padding: 9px;
       border-radius: 8px;
-      font-size: 13px;
+      font-size: 15px;
       font-weight: 700;
       cursor: pointer;
       transition: background 0.2s;
@@ -886,8 +913,8 @@
     /* 성공 성취 알림 카드 */
     .achievement-card {
       display: none;
-      background: linear-gradient(135deg, #fef3c7 0%, #dbeafe 100%);
-      border: 2px solid #f59e0b;
+      background: var(--primary-light);
+      border: 2px solid var(--border-strong);
       border-radius: 12px;
       padding: 12px;
       text-align: center;
@@ -900,15 +927,15 @@
     }
 
     .achievement-title {
-      font-size: 14px;
+      font-size: 16px;
       font-weight: 800;
-      color: #b45309;
+      color: var(--primary-dark);
       margin-bottom: 4px;
     }
 
     .achievement-desc {
-      font-size: 11px;
-      color: #1e3a8a;
+      font-size: 13px;
+      color: var(--primary-dark);
       line-height: 1.4;
       font-weight: 600;
     }
@@ -933,7 +960,7 @@
       align-items: center;
       gap: clamp(10px, 2vw, 24px);
       overflow: auto;
-      font-size: 14px;
+      font-size: 16px;
       line-height: 1.45;
     }
 
@@ -941,21 +968,22 @@
     .worksheet h2 { font-size: 18px; margin-bottom: 6px; }
     .worksheet figure { text-align: center; }
     .worksheet svg { width: 100%; max-width: 280px; height: auto; display: block; margin: auto; }
-    .worksheet figcaption { font-size: 13px; }
+    .worksheet figcaption { font-size: 15px; }
     #extensionActivity {
       grid-template-columns: minmax(0, 1fr);
       align-content: start;
       justify-items: center;
       gap: 8px;
     }
-    .extension-problem { width: min(100%, 520px); }
+    .extension-problem { width: min(100%, 740px); }
     #extensionQuestion { margin-top: 6px; }
+    #extensionProgress { font-size: 13px; color: var(--text-muted); }
     .worksheet ol { display: grid; gap: 8px; padding-left: 1.4em; margin: 8px 0; }
     .worksheet input, .worksheet select {
       display: block;
       width: 100%;
       padding: 5px 7px;
-      border: 1px solid #94a3b8;
+      border: 1px solid var(--border-strong);
       border-radius: 5px;
       background: white;
       color: inherit;
@@ -968,12 +996,12 @@
     .activity-actions { flex-wrap: wrap; }
     #tileEquation select { flex: 1; min-width: 0; padding-inline: 2px; }
     .worksheet input[aria-invalid="true"], #tileEquation[aria-invalid="true"] select { border-color: #b91c1c; }
-    .worksheet [role="status"], #formulaNotice { font-size: 13px; color: #4338ca; margin-top: 6px; }
+    .worksheet [role="status"], #formulaNotice { font-size: 15px; color: var(--primary-dark); margin-top: 6px; }
     .worksheet .symbol-chip-group { justify-content: flex-start; margin-top: 6px; }
     .worksheet .btn-action { margin-top: 6px; }
     #puzzleDiscovery .symbol-chip-group { margin: 5px 0; }
-    .header-right .btn-icon { width: auto; padding: 0 9px; font-size: 13px; white-space: nowrap; }
-    #fullscreenNotice { position: fixed; right: 12px; top: 58px; z-index: 30; background: white; font-size: 13px; }
+    .header-right .btn-icon { width: auto; padding: 0 9px; font-size: 15px; white-space: nowrap; }
+    #fullscreenNotice { position: fixed; right: 12px; top: 58px; z-index: 30; background: white; font-size: 15px; }
 
     @media (max-height: 700px) {
       body { overflow-y: auto; }
@@ -990,7 +1018,7 @@
     @media (max-width: 640px) {
       main { grid-template-columns: minmax(0, 1fr); }
       .badge-curriculum { display: none; }
-      .app-title { font-size: 14px; }
+      .app-title { font-size: 16px; }
       .panel-center { min-height: 690px; }
       .worksheet { grid-template-columns: minmax(0, 1fr); align-content: start; }
       .worksheet svg { max-height: 150px; }
@@ -1089,7 +1117,7 @@
         <!-- 밑변 a 조절 -->
         <div class="slider-row">
           <div class="slider-label-row">
-            <span><span class="color-indicator" style="background:#0284c7;"></span>밑변 a</span>
+            <span><span class="color-indicator side-a"></span>밑변 a</span>
             <span class="slider-val-box" id="valBoxA">$a = 3 (a^{2} = 9)$</span>
           </div>
           <input type="range" min="1" max="15" value="3" step="1" class="custom-range" id="sliderA">
@@ -1098,16 +1126,16 @@
         <!-- 높이 b 조절 -->
         <div class="slider-row">
           <div class="slider-label-row">
-            <span><span class="color-indicator" style="background:#ea580c;"></span>높이 b</span>
+            <span><span class="color-indicator side-b"></span>높이 b</span>
             <span class="slider-val-box" id="valBoxB">$b = 4 (b^{2} = 16)$</span>
           </div>
           <input type="range" min="1" max="15" value="4" step="1" class="custom-range" id="sliderB">
         </div>
 
         <!-- 빗변 c 안내 -->
-        <div class="slider-label-row" style="margin-top: 6px; padding: 4px 6px; background:#f1f5f9; border-radius:6px;">
-          <span><span class="color-indicator" style="background:#7c3aed;"></span><span id="sideCLabel">직각일 때 빗변 c</span></span>
-          <span style="font-size:12px; font-weight:700; color:#7c3aed;" id="valBoxC">$c = 5.0 (c^{2} = 25)$</span>
+        <div class="slider-label-row c-value">
+          <span><span class="color-indicator side-c"></span><span id="sideCLabel">직각일 때 빗변 c</span></span>
+          <strong class="side-c" id="valBoxC">$c = 5.0 (c^{2} = 25)$</strong>
         </div>
 
         <!-- 피타고라스 대표 삼쌍 퀵 버튼 -->
@@ -1129,12 +1157,12 @@
           <div class="tutor-avatar">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
               <!-- 부엉이 마스코트 SVG -->
-              <circle cx="12" cy="12" r="10" fill="#0284c7" />
+              <circle cx="12" cy="12" r="10" fill="var(--primary-dark)" />
               <circle cx="8" cy="10" r="3" fill="#ffffff" />
               <circle cx="16" cy="10" r="3" fill="#ffffff" />
               <circle cx="8" cy="10" r="1.5" fill="#0f172a" />
               <circle cx="16" cy="10" r="1.5" fill="#0f172a" />
-              <polygon points="12,12 10,15 14,15" fill="#f59e0b" />
+              <polygon points="12,12 10,15 14,15" fill="var(--primary-light)" />
               <path d="M7 6L5 3M17 6L19 3" stroke="#ffffff" stroke-width="2" stroke-linecap="round" />
             </svg>
           </div>
@@ -1177,11 +1205,11 @@
           <svg viewBox="0 0 240 240" role="img" aria-labelledby="tileDiagramTitle">
             <title id="tileDiagramTitle">그림 1. 위에서부터 A·E·D, F·I·H, B·G·C 순서의 점과 E·F·G·H를 잇는 정사각형. 삼각형 EFI가 색칠되어 있습니다.</title>
             <rect x="32" y="32" width="176" height="176" fill="#fff"/>
-            <path d="M120 32 32 120 120 208 208 120Z" fill="#e0e7ff"/>
-            <path d="M120 32 32 120 120 120Z" fill="#a5b4fc"/>
+            <path d="M120 32 32 120 120 208 208 120Z" fill="var(--shape-a-light)"/>
+            <path d="M120 32 32 120 120 120Z" fill="var(--shape-b)"/>
             <path d="M32 32H208V208H32Z M120 32V208 M32 120H208 M120 32 32 120 120 208 208 120Z"
-                  fill="none" stroke="#334155" stroke-width="2"/>
-            <path d="M108 120V108H120" fill="none" stroke="#334155" stroke-width="1.5"/>
+                  fill="none" stroke="var(--shape-outline)" stroke-width="2"/>
+            <path d="M108 120V108H120" fill="none" stroke="var(--shape-outline)" stroke-width="1.5"/>
             <g fill="#1e293b" font-size="15" font-weight="700">
               <text x="17" y="25">A</text><text x="115" y="23">E</text><text x="213" y="25">D</text>
               <text x="14" y="125">F</text><text x="126" y="114">I</text><text x="215" y="125">H</text>
@@ -1216,8 +1244,8 @@
       <section class="worksheet" id="extensionActivity" aria-labelledby="extensionTitle" hidden>
         <figure>
           <svg viewBox="0 0 240 190" role="img" aria-label="두 직각변 a, b의 길이가 서로 다른 직각삼각형. 빗변 길이는 c.">
-            <path d="M24 147H207V32Z" fill="#e0e7ff" stroke="#4338ca" stroke-width="3"/>
-            <path d="M192 147V132H207" fill="none" stroke="#4338ca" stroke-width="2"/>
+            <path d="M24 147H207V32Z" fill="var(--shape-a-light)" stroke="var(--shape-outline)" stroke-width="3"/>
+            <path d="M192 147V132H207" fill="none" stroke="var(--shape-outline)" stroke-width="2"/>
             <g color="#1e293b" font-size="17" font-weight="700" aria-hidden="true">
               <foreignObject x="113" y="153" width="24" height="26"><div data-diagram-math>$a$</div></foreignObject>
               <foreignObject x="216" y="75" width="24" height="26"><div data-diagram-math>$b$</div></foreignObject>
@@ -1229,6 +1257,7 @@
           <h2 id="extensionTitle">직각삼각형으로 확장하기</h2>
           <p>그림에서 두 직각변의 길이 $a, b$를 고정하고 다음 질문에 답해 보세요.</p>
           <p id="extensionQuestion"></p>
+          <p id="extensionProgress"></p>
           <div class="symbol-chip-group" id="extensionChoices"></div>
           <p id="extensionFeedback" role="status"></p>
           <div class="activity-actions">
@@ -1270,10 +1299,10 @@
               <th>$a$</th>
               <th>$b$</th>
               <th>$c$</th>
-              <th>밑변의 제곱<br><span style="color:#0284c7; font-weight:800;">$(a^{2})$</span></th>
-              <th>높이의 제곱<br><span style="color:#ea580c; font-weight:800;">$(b^{2})$</span></th>
-              <th>두 제곱의 합<br><span style="color:#2563eb; font-weight:800;">$(a^{2}+b^{2})$</span></th>
-              <th>빗변의 제곱<br><span style="color:#7c3aed; font-weight:800;">$(c^{2})$</span></th>
+              <th>밑변의 제곱<br><span class="side-a">$(a^{2})$</span></th>
+              <th>높이의 제곱<br><span class="side-b">$(b^{2})$</span></th>
+              <th>두 제곱의 합<br>$(a^{2}+b^{2})$</th>
+              <th>빗변의 제곱<br><span class="side-c">$(c^{2})$</span></th>
             </tr>
           </thead>
           <tbody id="dataTableBody">
@@ -1487,6 +1516,20 @@
        3. 캔버스 초기화 & 지오메트리 렌더러
        ======================================================== */
     const canvas = document.getElementById('geometryCanvas');
+    const theme = getComputedStyle(document.documentElement);
+    const themeColor = name => theme.getPropertyValue(name).trim();
+    const shapePalette = side => ({
+      fill: themeColor(`--shape-${side}`),
+      light: themeColor(`--shape-${side}-light`),
+      ink: themeColor(`--shape-${side}-ink`)
+    });
+    const shapeA = shapePalette('a');
+    const shapeB = shapePalette('b');
+    const shapeC = shapePalette('c');
+    const shapeOutline = themeColor('--shape-outline');
+    const shapeNeutral = themeColor('--shape-neutral');
+    const puzzleColors = ['--piece-1', '--piece-2', '--piece-3', '--piece-4'].map(themeColor);
+    const canvasFont = getComputedStyle(document.body).fontFamily;
     const geometryStage = document.getElementById('geometryStage');
     const ctx = canvas.getContext('2d');
     let canvasW = 0;
@@ -1573,21 +1616,21 @@
         C: toScreen(0, 0),
         B: toScreen(-a, 0),
         A: toScreen(0, b),
-        // a^2 정사각형 (초록/청록: 밑변 a 외부 아래쪽)
+        // a^2 정사각형 (밑변 a 외부 아래쪽)
         sqA: [
           toScreen(-a, 0),
           toScreen(0, 0),
           toScreen(0, -a),
           toScreen(-a, -a)
         ],
-        // b^2 정사각형 (주황: 높이 b 외부 오른쪽)
+        // b^2 정사각형 (높이 b 외부 오른쪽)
         sqB: [
           toScreen(0, 0),
           toScreen(b, 0),
           toScreen(b, b),
           toScreen(0, b)
         ],
-        // c^2 정사각형 (보라: 빗변 c 외부 왼쪽 위)
+        // c^2 정사각형 (빗변 c 외부 왼쪽 위)
         sqC: [
           toScreen(-a, 0),
           toScreen(-a - b, a),
@@ -1624,9 +1667,9 @@
         renderWaterMode();
       } else if (State.mode === 'data') {
         const geom = computeGeometry();
-        drawPolygon(geom.sqA, '#e0f2fe', '#0284c7');
-        drawPolygon(geom.sqB, '#ffedd5', '#ea580c');
-        drawPolygon(geom.sqC, '#ede9fe', '#7c3aed');
+        drawPolygon(geom.sqA, shapeA.light, shapeA.ink);
+        drawPolygon(geom.sqB, shapeB.light, shapeB.ink);
+        drawPolygon(geom.sqC, shapeC.light, shapeC.ink);
         renderBaseTriangle(geom);
       }
 
@@ -1643,10 +1686,10 @@
       ctx.lineTo(B.x, B.y);
       ctx.lineTo(A.x, A.y);
       ctx.closePath();
-      ctx.fillStyle = '#f8fafc';
+      ctx.fillStyle = "#fff";
       ctx.fill();
       ctx.lineWidth = 3;
-      ctx.strokeStyle = '#334155';
+      ctx.strokeStyle = shapeOutline;
       ctx.stroke();
 
       // 직각 표시 기호 (직각 C가 오른쪽에 있으므로 왼쪽 위 방향으로 사각형 표시)
@@ -1656,22 +1699,22 @@
       ctx.lineTo(C.x - rSize, C.y - rSize);
       ctx.lineTo(C.x, C.y - rSize);
       ctx.lineWidth = 2;
-      ctx.strokeStyle = '#ef4444';
+      ctx.strokeStyle = shapeB.ink;
       ctx.stroke();
 
       // 변 길이 레이블
-      drawLabel(`$a = ${State.a}$`, (C.x + B.x) / 2, C.y + 16, '#0284c7', 13);
-      drawLabel(`$b = ${State.b}$`, C.x + 24, (C.y + A.y) / 2, '#ea580c', 13);
+      drawLabel(`$a = ${State.a}$`, (C.x + B.x) / 2, C.y + 16, shapeA.ink, 13);
+      drawLabel(`$b = ${State.b}$`, C.x + 24, (C.y + A.y) / 2, shapeB.ink, 13);
       
       const midAB = { x: (A.x + B.x) / 2, y: (A.y + B.y) / 2 };
       // 빗변 안쪽에 라벨
-      drawLabel(`$c = ${State.c.toFixed(1)}$`, midAB.x - 14, midAB.y - 12, '#7c3aed', 13);
+      drawLabel(`$c = ${State.c.toFixed(1)}$`, midAB.x - 14, midAB.y - 12, shapeC.ink, 13);
 
       // 꼭짓점 점 표시
       [C, B, A].forEach((p, i) => {
         ctx.beginPath();
         ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
-        ctx.fillStyle = '#1e293b';
+        ctx.fillStyle = shapeOutline;
         ctx.fill();
       });
     }
@@ -1705,9 +1748,9 @@
       return latex.replace(/\^\{2\}/g, '²').replace(/\^\{\\circ\}/g, '°');
     }
 
-    function drawLabel(text, x, y, color, size = 12, isBold = true) {
+    function drawLabel(text, x, y, color, size = 14, isBold = true) {
       ctx.save();
-      ctx.font = `${isBold ? 'bold ' : ''}${size}px -apple-system, sans-serif`;
+      ctx.font = `${isBold ? 'bold ' : ''}${size}px ${canvasFont}`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillStyle = color;
@@ -1716,8 +1759,8 @@
     }
 
     /* 5-2. 모드 1: 물 채우기 렌더링 */
-    const waterA = { fill: '#38bdf8', stroke: '#0284c7' };
-    const waterB = { fill: '#fb923c', stroke: '#ea580c' };
+    const waterA = shapeA;
+    const waterB = shapeB;
     const waterCases = [
       { angle: 30, title: '30° · 예각' },
       { angle: 90, title: '90° · 직각' },
@@ -1778,7 +1821,7 @@
       // 같은 길이의 변이 세 그림에서 화면상으로도 같은 길이가 되게 한다.
       const scale = Math.min(Math.max(1, column - 20) / width, Math.max(1, canvasH - top - bottom) / height);
       const y = Math.max(top, (canvasH - bottom + top - height * scale) / 2);
-      drawLabel(`세 삼각형의 공통 길이   $a = ${State.a}$   $b = ${State.b}$`, canvasW / 2, y - 46, '#334155', 12);
+      drawLabel(`세 삼각형의 공통 길이   $a = ${State.a}$   $b = ${State.b}$`, canvasW / 2, y - 46, shapeOutline, 12);
 
       models.forEach((model, index) => {
         const { angle, title } = waterCases[index];
@@ -1792,12 +1835,12 @@
           sqA: model.sqA.map(toScreen), sqB: model.sqB.map(toScreen), sqC: model.sqC.map(toScreen)
         };
         const { level, overflow, empty } = getWaterAmounts(model.capacity, received);
-        drawLabel(title, x, y - 20, '#1e293b', 13);
+        drawLabel(title, x, y - 20, shapeOutline, 13);
         renderWaterTriangle(geom, remaining, level, angle);
 
         const captionY = y + height * scale + 18;
         const c = Number(Math.sqrt(model.capacity).toFixed(2));
-        drawLabel(`$c = ${c}$`, x, captionY, '#6d28d9', 12);
+        drawLabel(`$c = ${c}$`, x, captionY, shapeC.ink, 12);
         if (overflow > 0) {
           const barWidth = Math.min(94, column - 12) * overflow / State.c2;
           const blueWidth = barWidth * State.a2 / State.c2;
@@ -1807,19 +1850,19 @@
           ctx.fillStyle = waterB.fill;
           ctx.fillRect(x - barWidth / 2 + blueWidth, captionY + 13, barWidth - blueWidth, 5);
           ctx.restore();
-          drawLabel(`넘친 물 ${Number(overflow.toFixed(1))}`, x, captionY + 29, '#9a3412', 11);
+          drawLabel(`넘친 물 ${Number(overflow.toFixed(1))}`, x, captionY + 29, shapeB.ink, 11);
         } else if (State.waterProgress === 1) {
           const status = empty > 0 ? `빈 공간 ${Number(empty.toFixed(1))}` : '빈틈없이 채움';
-          drawLabel(status, x, captionY + 29, empty > 0 ? '#6d28d9' : '#047857', 11);
+          drawLabel(status, x, captionY + 29, empty > 0 ? shapeC.ink : shapeC.ink, 11);
         }
       });
     }
 
     function renderWaterTriangle(geom, remaining, level, angle) {
       const { A, B, C, sqA, sqB, sqC } = geom;
-      drawPolygon(sqA, '#f0f9ff', waterA.stroke, 1.5);
-      drawPolygon(sqB, '#fff7ed', waterB.stroke, 1.5);
-      drawPolygon(sqC, '#faf5ff', '#7c3aed', 1.5);
+      drawPolygon(sqA, shapeA.light, waterA.ink, 1.5);
+      drawPolygon(sqB, shapeB.light, waterB.ink, 1.5);
+      drawPolygon(sqC, shapeC.light, shapeC.ink, 1.5);
 
       const [blue, orange] = getHypotWaterRegions(sqC);
       const surface = level > 0 ? getWaterSurface(sqC, level) : Math.max(...sqC.map(point => point.y));
@@ -1830,11 +1873,11 @@
         drawPolygon(clipWaterSurface(orange, surface), waterB.fill);
       }
 
-      drawPolygon([A, B, C], '#fff', '#334155', 1.5);
+      drawPolygon([A, B, C], '#fff', shapeOutline, 1.5);
       const radians = angle * Math.PI / 180;
       const radius = Math.min(12, Math.hypot(B.x - C.x, B.y - C.y) / 3, Math.hypot(A.x - C.x, A.y - C.y) / 3);
       ctx.save();
-      ctx.strokeStyle = '#e11d48';
+      ctx.strokeStyle = shapeB.ink;
       ctx.lineWidth = 1.5;
       ctx.beginPath();
       ctx.arc(C.x, C.y, radius, Math.PI, Math.PI + radians);
@@ -1846,7 +1889,7 @@
         renderWaterStream(sqB, orange, surface, waterB);
       }
       [
-        [sqA, '$a^{2}$', '#075985'], [sqB, '$b^{2}$', '#9a3412'], [sqC, '$c^{2}$', '#5b21b6']
+        [sqA, '$a^{2}$', shapeA.ink], [sqB, '$b^{2}$', shapeB.ink], [sqC, '$c^{2}$', shapeC.ink]
       ].forEach(([square, label, color]) => {
         if (Math.hypot(square[1].x - square[0].x, square[1].y - square[0].y) < 16) return;
         const center = getPolygonCenter(square);
@@ -1998,7 +2041,7 @@
     /* 5-3. 모드 2: 퍼즐맞추기 렌더링 */
     function initPuzzlePieces() {
       if (State.mode === 'puzzle' && State.puzzleSolved) showPuzzlePrompt();
-      State.puzzlePieces = ['#047857', '#0f766e', '#15803d', '#4d7c0f'].map((color, slot) => ({
+      State.puzzlePieces = puzzleColors.map((color, slot) => ({
         slot, color, w: State.a, h: State.b
       }));
       resetPuzzlePieces();
@@ -2074,12 +2117,12 @@
       const b = State.b * scale;
       const box = (x, y, width, fill) => drawPolygon([
         {x, y}, {x: x + width, y}, {x: x + width, y: y + width}, {x, y: y + width}
-      ], fill, '#64748b', 1.5);
+      ], fill, shapeOutline, 1.5);
 
-      box(source.x, source.y, side, '#f1f5f9');
-      box(target.x, target.y, side, '#f1f5f9');
-      box(source.x, source.y, a, '#38bdf8');
-      box(source.x + a, source.y + a, b, '#fb923c');
+      box(source.x, source.y, side, shapeNeutral);
+      box(target.x, target.y, side, shapeNeutral);
+      box(source.x, source.y, a, shapeA.fill);
+      box(source.x + a, source.y + a, b, shapeB.fill);
       const complete = State.puzzlePieces.every(p => p.placed);
       if (complete) {
         drawPolygon([
@@ -2087,23 +2130,23 @@
           {x: target.x + b, y: target.y},
           {x: target.x + side, y: target.y + b},
           {x: target.x + a, y: target.y + side}
-        ], '#c084fc', '#6d28d9', 1.5);
+        ], shapeC.fill, shapeC.ink, 1.5);
       }
-      drawLabel('재배치 전', source.x + side / 2, source.y - 12, '#334155', 13, true);
-      drawLabel('재배치 후', target.x + side / 2, target.y - 12, '#334155', 13, true);
+      drawLabel('재배치 전', source.x + side / 2, source.y - 12, shapeOutline, 13, true);
+      drawLabel('재배치 후', target.x + side / 2, target.y - 12, shapeOutline, 13, true);
 
       // 각 점선은 같은 색 조각이 들어갈 자리를 나타낸다.
       ctx.save();
       ctx.setLineDash([4, 4]);
       State.puzzlePieces.forEach(p => {
-        drawPuzzleTriangle(p, getPuzzleHome(p, layout), p.slot * 90, scale, '#e2e8f0', '#94a3b8');
+        drawPuzzleTriangle(p, getPuzzleHome(p, layout), p.slot * 90, scale, shapeNeutral, shapeOutline);
         const { center, rot } = getPuzzleTarget(p, layout);
         drawPuzzleTriangle(p, center, rot, scale, null, p.color);
       });
       ctx.restore();
 
       State.puzzlePieces.forEach(p => {
-        drawPuzzleTriangle(p, p.current, p.rot, scale, p.color, State.selectedPiece === p ? '#312e81' : '#fff');
+        drawPuzzleTriangle(p, p.current, p.rot, scale, p.color, State.selectedPiece === p ? shapeOutline : '#fff');
       });
 
       if (complete) {
@@ -2129,18 +2172,18 @@
       const H = lerp(B, A, ratio);
       const Hout = lerp(sqC[1], sqC[2], ratio);
 
-      drawPolygon(sqA, '#f0f9ff', '#0284c7', 1.5);
-      drawPolygon(sqB, '#fff7ed', '#ea580c', 1.5);
-      drawPolygon(sqC, '#faf5ff', '#7c3aed', 2);
+      drawPolygon(sqA, shapeA.light, shapeA.ink, 1.5);
+      drawPolygon(sqB, shapeB.light, shapeB.ink, 1.5);
+      drawPolygon(sqC, shapeC.light, shapeC.ink, 2);
       if (step === 2 && t === 1) {
-        drawPolygon([B, sqC[1], Hout, H], '#bae6fd', '#0284c7', 1.5);
-        drawPolygon([A, sqC[2], Hout, H], '#fed7aa', '#ea580c', 1.5);
+        drawPolygon([B, sqC[1], Hout, H], shapeA.light, shapeA.ink, 1.5);
+        drawPolygon([A, sqC[2], Hout, H], shapeB.light, shapeB.ink, 1.5);
       }
 
       // 색칠된 삼각형을 그리기 전에 흰색 삼각형과 보조선을 그린다.
       renderBaseTriangle(geom);
       ctx.save();
-      ctx.strokeStyle = '#a855f7';
+      ctx.strokeStyle = shapeC.ink;
       ctx.setLineDash([5, 5]);
       ctx.beginPath();
       ctx.moveTo(C.x, C.y);
@@ -2149,8 +2192,8 @@
       ctx.restore();
 
       [
-        { pivot: B, corner: sqA[3], opposite: A, outer: sqC[1], direction: -1, color: '#38bdf8' },
-        { pivot: A, corner: sqB[2], opposite: B, outer: sqC[2], direction: 1, color: '#fb923c' }
+        { pivot: B, corner: sqA[3], opposite: A, outer: sqC[1], direction: -1, color: shapeA.fill },
+        { pivot: A, corner: sqB[2], opposite: B, outer: sqC[2], direction: 1, color: shapeB.fill }
       ].forEach(({ pivot, corner, opposite, outer, direction, color }) => {
         if (step === 0) {
           drawTransformedTriangle(pivot, corner, lerp(C, opposite, t), color);
@@ -2175,7 +2218,7 @@
       ctx.save();
       ctx.fillStyle = color;
       ctx.globalAlpha = 0.65;
-      ctx.strokeStyle = '#1e293b';
+      ctx.strokeStyle = shapeOutline;
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.moveTo(p1.x, p1.y);
@@ -2359,7 +2402,7 @@
 
     function updateSnapIndicator() {
       snapIndicator.textContent = State.snapTriples ? '자연수 c ON' : '자연수 c OFF';
-      btnSnapToggle.style.background = State.snapTriples ? '#eef2ff' : '#f1f5f9';
+      btnSnapToggle.style.background = State.snapTriples ? 'var(--primary-light)' : 'var(--surface-tint)';
     }
 
     // 물 붓기 / 비우기 버튼
@@ -2370,7 +2413,7 @@
       } else {
         State.isPouring = true;
         Sound.splash();
-        setTutorSpeech('물줄기가 도착하면 보라색 정사각형의 물이 차오를 거야. 어느 각에서 물이 딱 맞을까?');
+        setTutorSpeech('물줄기가 도착하면 갈색 정사각형의 물이 차오를 거야. 어느 각에서 물이 딱 맞을까?');
       }
       updatePourButtonUI();
     });
@@ -2387,7 +2430,7 @@
       saveProgress();
       Sound.fanfare();
       if (State.mode !== 'water') return;
-      setTutorSpeech("파란 물은 $a^{2}$, 주황 물은 $b^{2}$에서 왔어. 30°에서는 물이 넘치고, 90°에서는 딱 맞고, 120°에서는 빈 공간이 남아. 보낸 물의 양은 같은데 결과가 왜 다를까?");
+      setTutorSpeech("황토색 물은 $a^{2}$, 살구색 물은 $b^{2}$에서 왔어. 30°에서는 물이 넘치고, 90°에서는 딱 맞고, 120°에서는 빈 공간이 남아. 보낸 물의 양은 같은데 결과가 왜 다를까?");
     }
 
     const tileSquares = [
@@ -2473,6 +2516,7 @@
       }
     ];
     const extensionQuestion = document.getElementById('extensionQuestion');
+    const extensionProgress = document.getElementById('extensionProgress');
     const extensionChoices = document.getElementById('extensionChoices');
     const extensionFeedback = document.getElementById('extensionFeedback');
     const btnGoToData = document.getElementById('btnGoToData');
@@ -2485,12 +2529,13 @@
       extensionFeedback.textContent = '';
       extensionChoices.replaceChildren();
       btnGoToData.hidden = Boolean(step);
+      extensionProgress.textContent = step ? `${index + 1}/${extensionSteps.length}` : '';
       if (!step) {
         setMathText(extensionQuestion, '예상한 식은 $a^{2} + b^{2} = c^{2}$예요.');
         extensionFeedback.textContent = 'SAS 합동으로 빗변의 길이가 하나로 정해져요. 이제 변의 길이를 바꿔 가며 예상한 넓이 관계를 표에서 확인해 보세요.';
         return;
       }
-      setMathText(extensionQuestion, `${index + 1}/${extensionSteps.length} · ${step.question}`);
+      setMathText(extensionQuestion, step.question);
       step.choices.forEach((choice, choiceIndex) => {
         const button = document.createElement('button');
         button.className = 'symbol-chip';
@@ -2569,8 +2614,8 @@
       {
         title: '3단계 · 빗변 정사각형 안으로 옮기기',
         prompts: [
-          ['파란 삼각형은 파란 직사각형과 밑변과 높이가 같아. 주황색도 같은 방법으로 비교해 봐. 삼각형 하나의 넓이는 같은 색 직사각형 넓이의 ', '이야.'],
-          ['파란 직사각형의 넓이는 밑변 위 정사각형과 같고, 주황 직사각형의 넓이는 높이 위 정사각형과 같아. 두 직사각형을 합치면 빗변 위 정사각형이 돼. 이 관계를 식으로 쓰면 ', '이야.']
+          ['황토색 삼각형은 황토색 직사각형과 밑변과 높이가 같아. 살구색도 같은 방법으로 비교해 봐. 삼각형 하나의 넓이는 같은 색 직사각형 넓이의 ', '이야.'],
+          ['황토색 직사각형의 넓이는 밑변 위 정사각형과 같고, 살구색 직사각형의 넓이는 높이 위 정사각형과 같아. 두 직사각형을 합치면 빗변 위 정사각형이 돼. 이 관계를 식으로 쓰면 ', '이야.']
         ],
         hints: ['밑변과 높이가 같을 때 직사각형과 삼각형의 넓이 공식을 비교해 봐.', '빗변 위 정사각형 전체의 넓이가 등호 오른쪽에 와야 해.'],
         summary: '같은 색 삼각형의 넓이를 두 배 하면 작은 정사각형의 넓이이자 빗변 쪽 직사각형의 넓이야. 그래서 $a^{2} + b^{2} = c^{2}$가 성립해.',
@@ -2651,7 +2696,7 @@
         hint: '조각을 옮기는 동안 조각을 자르거나 크기를 바꿨는지 살펴보세요.'
       },
       {
-        prompt: '두 판의 전체 넓이도, 조각이 덮는 넓이도 같아요. 남은 파란 정사각형과 주황 정사각형의 넓이 합은 보라 정사각형의 넓이와 어떻게 비교될까요?',
+        prompt: '두 판의 전체 넓이도, 조각이 덮는 넓이도 같아요. 남은 황토색 정사각형과 살구색 정사각형의 넓이 합은 갈색 정사각형의 넓이와 어떻게 비교될까요?',
         choices: ['더 작아요', '같아요', '더 커요'],
         answer: 1,
         hint: '크기가 같은 두 판에서 같은 넓이를 빼면 각각 얼마나 남을까요?'
@@ -2663,7 +2708,7 @@
     function showPuzzlePrompt() {
       puzzleDiscovery.hidden = true;
       tutorSpeech.hidden = false;
-      canvasHint.textContent = '초록 계열의 삼각형 조각을 같은 색 점선으로 옮겨 보세요. [자동맞춤]은 조각 옮기기를 도와줘요.';
+      canvasHint.textContent = '삼각형 조각을 같은 색 점선으로 옮겨 보세요. [자동맞춤]은 조각 옮기기를 도와줘요.';
       setTutorSpeech("크기가 같은 두 판이 있어. 첫 번째 판의 삼각형 네 조각을 두 번째 판으로 옮겨 봐. 조각이 덮지 않은 색칠 영역이 어떻게 달라지는지 살펴보자!");
     }
 
@@ -2676,9 +2721,9 @@
       puzzleChoices.replaceChildren();
       canvasHint.textContent = '색칠 영역을 살펴보고 위에 있는 피타 쌤의 질문에 답해 보세요.';
       if (!question) {
-        puzzleQuestion.textContent = '발견! 파란 정사각형과 주황 정사각형의 넓이 합은 보라 정사각형의 넓이와 같아요.';
+        puzzleQuestion.textContent = '발견! 황토색 정사각형과 살구색 정사각형의 넓이 합은 갈색 정사각형의 넓이와 같아요.';
         puzzleFeedback.textContent = '타일 분석하기로 이동해 이 넓이 관계를 식으로 나타내 봐요.';
-        canvasHint.textContent = '파랑 넓이와 주황 넓이를 더하면 보라 넓이와 같아요.';
+        canvasHint.textContent = '황토색 영역의 넓이와 살구색 영역의 넓이를 더하면 갈색 영역의 넓이와 같아요.';
         return;
       }
       puzzleQuestion.textContent = question.prompt;
@@ -3019,7 +3064,7 @@
     resizeConfetti();
 
     function triggerConfetti(startX, startY, count = 50) {
-      const colors = ['#f43f5e', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'];
+      const colors = [shapeA.fill, shapeB.fill, shapeC.fill, shapeOutline];
       for (let i = 0; i < count; i++) {
         const angle = Math.random() * Math.PI * 2;
         const speed = Math.random() * 8 + 3;
