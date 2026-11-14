@@ -161,15 +161,20 @@
     main {
       flex: 1;
       display: grid;
-      grid-template-columns: 280px minmax(0, 1fr) 250px;
+      --left-panel-width: 280px;
+      grid-template-columns: var(--left-panel-width) minmax(0, 1fr);
       height: calc(100vh - 56px);
       overflow: hidden;
       background: var(--surface-tint);
     }
 
+    main[data-mode="data"] {
+      grid-template-columns: var(--left-panel-width) minmax(0, 1fr) clamp(360px, 32vw, 490px);
+    }
+
     @media (max-width: 1100px) {
       main {
-        grid-template-columns: 240px minmax(0, 1fr) 225px;
+        --left-panel-width: 240px;
       }
     }
 
@@ -736,11 +741,18 @@
 
     .data-table {
       width: 100%;
-      min-width: 400px;
+      table-layout: fixed;
       border-collapse: collapse;
       font-size: 13px;
       text-align: center;
     }
+
+    .data-table :is(th, td) {
+      overflow-wrap: anywhere;
+    }
+
+    .data-table th:nth-child(-n + 3) { width: 9%; }
+    .data-table th:nth-child(4) { width: 12%; }
 
     .data-table th {
       background: var(--surface-soft);
@@ -981,7 +993,7 @@
     .worksheet .symbol-chip-group { justify-content: flex-start; margin-top: 6px; }
     .worksheet .btn-action { margin-top: 6px; }
     #puzzleDiscovery .symbol-chip-group { margin: 5px 0; }
-    .header-right .btn-icon { width: auto; padding: 0 9px; font-size: 15px; white-space: nowrap; }
+    #btnFullscreen { width: auto; padding: 0 9px; font-size: 15px; white-space: nowrap; }
     #fullscreenNotice { position: fixed; right: 12px; top: 58px; z-index: 30; background: white; font-size: 15px; }
 
     @media (max-height: 700px) {
@@ -991,13 +1003,14 @@
 
     @media (max-width: 930px) {
       body { height: auto; min-height: 100dvh; overflow: auto; }
-      main { grid-template-columns: 220px minmax(0, 1fr); height: auto; overflow: visible; }
+      main, main[data-mode="data"] { grid-template-columns: 220px minmax(0, 1fr); height: auto; overflow: visible; }
       .panel-center { min-height: 620px; }
       .panel-right { grid-column: 1 / -1; }
     }
 
     @media (max-width: 640px) {
-      main { grid-template-columns: minmax(0, 1fr); }
+      main, main[data-mode="data"] { grid-template-columns: minmax(0, 1fr); }
+      .data-table :is(th, td) { padding-inline: 2px; }
       .badge-curriculum { display: none; }
       .app-title { font-size: 16px; }
       .panel-center { min-height: 690px; }
@@ -1019,7 +1032,7 @@
 
     <div class="header-right">
       <button class="btn-icon" id="btnFullscreen" aria-pressed="false">전체화면</button>
-      <button class="btn-icon" id="btnSoundToggle" type="button" aria-pressed="true">소리 켜짐</button>
+      <button class="btn-icon" id="btnSoundToggle" type="button" aria-label="소리" aria-pressed="true">🔊</button>
     </div>
   </header>
   <p id="fullscreenNotice" role="status"></p>
@@ -1073,10 +1086,10 @@
             <span>③ 타일 분석하기</span>
           </button>
           <button class="tab-btn" data-mode="extend" id="tabExtend">
-            <span>④ 직각삼각형으로 확장하기</span>
+            <span>④ 확장하기</span>
           </button>
           <button class="tab-btn" data-mode="data" id="tabData">
-            <span>⑤ 변 조작과 데이터 기록</span>
+            <span>⑤ 관계식 완성</span>
           </button>
           <button class="tab-btn" data-mode="euclid" id="tabEuclid">
             <span>⑥ 증명하기</span>
@@ -1178,7 +1191,7 @@
           <button class="btn-action" data-proof-step="0" aria-pressed="true">1단계</button>
           <button class="btn-action" data-proof-step="1" aria-pressed="false">2단계</button>
           <button class="btn-action" data-proof-step="2" aria-pressed="false">3단계</button>
-          <button class="btn-action" id="btnResetProof" type="button">다시 활동하기</button>
+          <button class="btn-action" id="btnResetProof" type="button" hidden>다시 활동하기</button>
         </div>
       </div>
 
@@ -1217,7 +1230,7 @@
           </ol>
           <div class="activity-actions">
             <button class="btn-action primary" id="btnCheckTile" type="button">답 확인</button>
-            <button class="btn-action" id="btnResetTile" type="button">다시 활동하기</button>
+            <button class="btn-action" id="btnResetTile" type="button" hidden>다시 활동하기</button>
           </div>
           <p id="tileFeedback" role="status"></p>
         </div>
@@ -1236,14 +1249,13 @@
           </svg>
         </figure>
         <div class="extension-problem">
-          <h2 id="extensionTitle">직각삼각형으로 확장하기</h2>
+          <h2 id="extensionTitle">확장하기</h2>
           <p id="extensionQuestion"></p>
           <p id="extensionProgress"></p>
           <div class="symbol-chip-group" id="extensionChoices"></div>
           <p id="extensionFeedback" role="status"></p>
           <div class="activity-actions">
-            <button class="btn-action primary" id="btnGoToData" type="button" hidden>변 조작과 데이터 기록으로 →</button>
-            <button class="btn-action" id="btnResetExtension" type="button">다시 활동하기</button>
+            <button class="btn-action" id="btnResetExtension" type="button" hidden>다시 활동하기</button>
           </div>
         </div>
       </section>
@@ -1256,7 +1268,7 @@
     </section>
 
     <!-- [우측 패널 20%] 데이터 및 상징화 노트 (Symbolic) -->
-    <aside class="panel-right" aria-label="탐구 기록 및 관계식" tabindex="0">
+    <aside class="panel-right" aria-label="탐구 기록 및 관계식" tabindex="0" hidden>
       <div class="progress-controls">
         <p id="progressStatus" role="status">학습 기록은 이 브라우저에만 저장돼요.</p>
         <button class="btn-subtle" id="btnClearProgress" type="button" hidden>학습 기록 지우기</button>
@@ -1289,7 +1301,7 @@
       </div>
 
       <!-- 수식 도출 & 상징화 완성하기 -->
-      <div class="formula-builder-card" id="formulaBuilder" hidden>
+      <div class="formula-builder-card">
         <div class="builder-question">
           데이터 표의 숫자를 보고<br><strong>세 정사각형 넓이의 관계식</strong>을 완성해봐!
         </div>
@@ -1325,7 +1337,7 @@
       </div>
 
       <!-- 성공 및 상징화 성취 알림 -->
-      <div class="achievement-card" id="achievementCard" hidden>
+      <div class="achievement-card" id="achievementCard">
         <div class="achievement-title">피타고라스 정리 발견!</div>
         <div class="achievement-desc">
           <strong>$a^{2} + b^{2} = c^{2}$</strong><br>
@@ -1796,7 +1808,8 @@
       const height = Math.max(...models.map(model => model.height));
       const width = Math.max(...models.map(model => model.width));
       // 같은 길이의 변이 세 그림에서 화면상으로도 같은 길이가 되게 한다.
-      const scale = Math.min(Math.max(1, column - 20) / width, Math.max(1, canvasH - top - bottom) / height);
+      const columnPadding = Math.min(64, Math.max(20, column * 0.18));
+      const scale = Math.min(Math.max(1, column - columnPadding) / width, Math.max(1, canvasH - top - bottom) / height);
       const y = Math.max(top, (canvasH - bottom + top - height * scale) / 2);
       drawLabel(`세 삼각형의 공통 길이   $a = ${State.a}$   $b = ${State.b}$`, canvasW / 2, y - 46, shapeOutline, 12);
 
@@ -1857,7 +1870,13 @@
       ctx.strokeStyle = shapeB.ink;
       ctx.lineWidth = 1.5;
       ctx.beginPath();
-      ctx.arc(C.x, C.y, radius, Math.PI, Math.PI + radians);
+      if (angle === 90) {
+        ctx.moveTo(C.x - radius, C.y);
+        ctx.lineTo(C.x - radius, C.y - radius);
+        ctx.lineTo(C.x, C.y - radius);
+      } else {
+        ctx.arc(C.x, C.y, radius, Math.PI, Math.PI + radians);
+      }
       ctx.stroke();
       ctx.restore();
 
@@ -2025,7 +2044,7 @@
     }
 
     function getPuzzleLayout() {
-      const gap = 28;
+      const gap = Math.max(28, Math.min(84, canvasW * 0.08));
       const top = 26;
       const availableHeight = Math.max(1, canvasH - top - 20);
       const stacked = canvasW < 410 && availableHeight >= canvasW * 1.2;
@@ -2230,6 +2249,8 @@
     const euclidTools = document.getElementById('euclidTools');
     const puzzleTools = document.getElementById('puzzleTools');
     const canvasToolbar = document.querySelector('.canvas-toolbar');
+    const mainLayout = document.querySelector('main');
+    const dataPanel = document.querySelector('.panel-right');
 
     function setMode(mode) {
       const activeTab = modeTabs.find(button => button.dataset.mode === mode);
@@ -2239,13 +2260,13 @@
         button.setAttribute('aria-pressed', button === activeTab);
       });
       State.mode = mode;
+      mainLayout.dataset.mode = mode;
+      dataPanel.hidden = mode !== 'data';
       const worksheetOpen = mode === 'tile' || mode === 'extend';
       document.getElementById('tileActivity').hidden = mode !== 'tile';
       document.getElementById('extensionActivity').hidden = mode !== 'extend';
       document.getElementById('triangleControls').hidden = worksheetOpen;
       sideCLabel.textContent = mode === 'water' ? '직각일 때 빗변 c' : '빗변 c';
-      document.getElementById('formulaBuilder').hidden = mode !== 'data';
-      document.getElementById('achievementCard').hidden = mode !== 'data';
       geometryStage.hidden = worksheetOpen;
       btnRecordData.hidden = mode !== 'data';
       btnPourWater.hidden = mode !== 'water';
@@ -2459,7 +2480,8 @@
       State.tileSolved = false;
       checkMissions();
     }));
-    document.getElementById('btnResetTile').addEventListener('click', () => {
+    const btnResetTile = document.getElementById('btnResetTile');
+    btnResetTile.addEventListener('click', () => {
       tileFields.forEach(field => {
         field.value = '';
         field.removeAttribute('aria-invalid');
@@ -2492,7 +2514,7 @@
     const extensionProgress = document.getElementById('extensionProgress');
     const extensionChoices = document.getElementById('extensionChoices');
     const extensionFeedback = document.getElementById('extensionFeedback');
-    const btnGoToData = document.getElementById('btnGoToData');
+    const btnResetExtension = document.getElementById('btnResetExtension');
 
     let extensionIndex = 0;
 
@@ -2501,7 +2523,6 @@
       const step = extensionSteps[index];
       extensionFeedback.textContent = '';
       extensionChoices.replaceChildren();
-      btnGoToData.hidden = Boolean(step);
       extensionProgress.textContent = step ? `${index + 1}/${extensionSteps.length}` : '';
       if (!step) {
         setMathText(extensionQuestion, '예상한 식은 $a^{2} + b^{2} = c^{2}$예요.');
@@ -2524,24 +2545,20 @@
             return;
           }
           showExtensionStep(extensionSteps.length);
-          btnGoToData.focus();
           State.extensionSolved = true;
           checkMissions();
+          btnResetExtension.focus();
         });
         extensionChoices.append(button);
       });
     }
 
     showExtensionStep(0);
-    document.getElementById('btnResetExtension').addEventListener('click', () => {
+    btnResetExtension.addEventListener('click', () => {
       State.extensionSolved = false;
       showExtensionStep(0);
       checkMissions();
-    });
-    btnGoToData.addEventListener('click', () => {
-      const tab = document.getElementById('tabData');
-      tab.click();
-      tab.focus();
+      extensionChoices.querySelector('button').focus();
     });
 
     const btnFullscreen = document.getElementById('btnFullscreen');
@@ -2651,10 +2668,12 @@
       button.addEventListener('click', () => selectProofStep(index));
     });
 
-    document.getElementById('btnResetProof').addEventListener('click', () => {
+    const btnResetProof = document.getElementById('btnResetProof');
+    btnResetProof.addEventListener('click', () => {
       proofAnswers.forEach(answers => { answers.length = 0; });
       selectProofStep(0);
       checkMissions();
+      proofButtons[0].focus();
     });
 
     const puzzleDiscovery = document.getElementById('puzzleDiscovery');
@@ -2984,6 +3003,9 @@
        ======================================================== */
     function checkMissions() {
       const proofComplete = proofSteps.every((step, index) => proofAnswers[index].length === step.answers.length);
+      btnResetTile.hidden = !State.tileSolved;
+      btnResetExtension.hidden = !State.extensionSolved;
+      btnResetProof.hidden = !proofComplete;
       const completed = [State.waterCompared, State.puzzleMissionDone, State.tileSolved,
         State.extensionSolved, State.formulaSolved, proofComplete];
       completed.forEach((done, index) => {
@@ -3013,7 +3035,7 @@
     const btnSoundToggle = document.getElementById('btnSoundToggle');
 
     function updateSoundButton() {
-      btnSoundToggle.textContent = State.soundEnabled ? '소리 켜짐' : '소리 꺼짐';
+      btnSoundToggle.textContent = State.soundEnabled ? '🔊' : '🔇';
       btnSoundToggle.setAttribute('aria-pressed', State.soundEnabled);
     }
 
