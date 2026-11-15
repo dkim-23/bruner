@@ -994,6 +994,7 @@
     @media (max-width: 640px) {
       header { height: auto; min-height: 56px; flex-wrap: wrap; gap: 6px; padding-block: 8px; }
       .header-right { flex-wrap: wrap; gap: 6px; }
+      #progressStatus { flex-basis: 100%; }
       main, main[data-mode="data"] { grid-template-columns: minmax(0, 1fr); }
       .panel-left { height: auto; }
       .panel-right { padding-inline: 10px; }
@@ -1023,8 +1024,9 @@
     </div>
 
     <div class="header-right">
-      <button class="btn-icon" id="btnFullscreen" aria-pressed="false">전체화면</button>
+      <p id="progressStatus" role="status">학습 기록은 이 브라우저에만 저장돼요.</p>
       <button class="btn-icon" id="btnClearProgress" type="button" disabled>학습 기록 지우기</button>
+      <button class="btn-icon" id="btnFullscreen" aria-pressed="false">전체화면</button>
       <button class="btn-icon" id="btnSoundToggle" type="button" aria-label="소리" aria-pressed="true">🔊</button>
     </div>
   </header>
@@ -1262,8 +1264,6 @@
 
     <!-- [우측 패널 20%] 데이터 및 상징화 노트 (Symbolic) -->
     <aside class="panel-right" aria-label="탐구 기록 및 관계식" tabindex="0" hidden>
-      <p id="progressStatus" role="status">학습 기록은 이 브라우저에만 저장돼요.</p>
-
       <!-- 탐구 데이터 표 -->
       <div class="section-title">
         <span id="dataTableTitle">탐구 데이터 표</span>
